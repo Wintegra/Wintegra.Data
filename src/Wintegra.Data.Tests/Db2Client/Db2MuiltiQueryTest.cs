@@ -1,4 +1,6 @@
 ﻿using System.Data;
+using System.Globalization;
+using System.Threading;
 using NUnit.Framework;
 
 namespace Wintegra.Data.Tests.Db2Client
@@ -6,13 +8,21 @@ namespace Wintegra.Data.Tests.Db2Client
 	[TestFixture]
 	public class Db2MuiltiQueryTest
 	{
+		[SetUp]
+		public void SetUp()
+		{
+			Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+			Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+		}
+
 		[Test]
 		public void TestSelectAndGetValue(
+			[Values("odbc", "jdbc")] string type,
 			[Values("67766215", "D519C704", "7F3D0A9B", "80971111")] string head_id,
 			[Values("F04D1BA3", "5B2BF4F1", "044815E1", "DB8CE88E")] string line_id,
 			[Values("simple", "any")] string note)
 		{
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
@@ -48,11 +58,12 @@ JOIN LINE l ON l.HEAD_ID=h.ID";
 
 		[Test]
 		public void TestSelectAndGetByName(
+			[Values("odbc", "jdbc")] string type,
 			[Values("67766215", "D519C704", "7F3D0A9B", "80971111")] string head_id,
 			[Values("F04D1BA3", "5B2BF4F1", "044815E1", "DB8CE88E")] string line_id,
 			[Values("simple", "any")] string note)
 		{
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
@@ -88,11 +99,12 @@ JOIN LINE l ON l.HEAD_ID=h.ID";
 
 		[Test]
 		public void TestSelectAndGetByAnyName(
+			[Values("odbc", "jdbc")] string type,
 			[Values("67766215", "D519C704", "7F3D0A9B", "80971111")] string head_id,
 			[Values("F04D1BA3", "5B2BF4F1", "044815E1", "DB8CE88E")] string line_id,
 			[Values("simple", "any")] string note)
 		{
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
@@ -134,15 +146,15 @@ JOIN LINE l ON l.HEAD_ID=h.ID";
 			using (var command = db.CreateCommand())
 			{
 				command.Transaction = tn;
-				command.CommandText = "INSERT INTO HEAD(ID, NOTE) VALUES(@ID, @NOTE)";
+				command.CommandText = "INSERT INTO HEAD(ID, NOTE) VALUES(:ID, :NOTE)";
 
 				IDbDataParameter parameterObject = command.CreateParameter();
-				parameterObject.ParameterName = "@ID";
+				parameterObject.ParameterName = "ID";
 				parameterObject.Value = head_id;
 				command.Parameters.Add(parameterObject);
 
 				parameterObject = command.CreateParameter();
-				parameterObject.ParameterName = "@NOTE";
+				parameterObject.ParameterName = "NOTE";
 				parameterObject.Value = note + ":head";
 				command.Parameters.Add(parameterObject);
 
@@ -152,20 +164,20 @@ JOIN LINE l ON l.HEAD_ID=h.ID";
 			using (var command = db.CreateCommand())
 			{
 				command.Transaction = tn;
-				command.CommandText = "INSERT INTO LINE(ID, HEAD_ID, NOTE) VALUES(@ID, @HEAD_ID, @NOTE)";
+				command.CommandText = "INSERT INTO LINE(ID, HEAD_ID, NOTE) VALUES(:ID, :HEAD_ID, :NOTE)";
 
 				IDbDataParameter parameterObject = command.CreateParameter();
-				parameterObject.ParameterName = "@ID";
+				parameterObject.ParameterName = "ID";
 				parameterObject.Value = line_id;
 				command.Parameters.Add(parameterObject);
 
 				parameterObject = command.CreateParameter();
-				parameterObject.ParameterName = "@HEAD_ID";
+				parameterObject.ParameterName = "HEAD_ID";
 				parameterObject.Value = head_id;
 				command.Parameters.Add(parameterObject);
 
 				parameterObject = command.CreateParameter();
-				parameterObject.ParameterName = "@NOTE";
+				parameterObject.ParameterName = "NOTE";
 				parameterObject.Value = note + ":line";
 				command.Parameters.Add(parameterObject);
 

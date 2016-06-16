@@ -13,7 +13,7 @@ namespace Wintegra.Data.Tests.Db2Client
 	{
 		public static string RandomString(int length)
 		{
-			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
 			var random = new Random((int)DateTime.UtcNow.Ticks);
 			var sb = new StringBuilder(length);
 			for (int i = 0; i < length; i++)
@@ -74,6 +74,33 @@ namespace Wintegra.Data.Tests.Db2Client
 		public static IList<T> QueryObjects<T>(this IDbConnection conn, string query, object paramObject, T templateObject, IDbTransaction tn)
 		{
 			return conn.QueryObjects<T>(query, paramObject, tn);
+		}
+	}
+
+	[Serializable]
+	public class XmlObjectData
+	{
+		public XmlObjectData() { }
+		public string Field { get; set; }
+	}
+
+	class DBG_TABLE
+	{
+		public String CLOB_TEXT { get; set; }
+		public String DBCLOB_TEXT { get; set; }
+		public byte[] BLOB_DATA { get; set; }
+		public XmlDocument XML_BODY { get; set; }
+	}
+
+	public class SqlQueryObject
+	{
+		public string DapperQuery { get; set; }
+		public string Query { get; set; }
+
+		public SqlQueryObject(string dapper, string sql)
+		{
+			this.DapperQuery = dapper;
+			this.Query = sql;
 		}
 	}
 }

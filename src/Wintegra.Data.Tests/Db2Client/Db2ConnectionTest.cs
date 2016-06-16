@@ -1,4 +1,7 @@
 ﻿using System.Data;
+using System.Data.Common;
+using System.Globalization;
+using System.Threading;
 using NUnit.Framework;
 
 namespace Wintegra.Data.Tests.Db2Client
@@ -6,14 +9,56 @@ namespace Wintegra.Data.Tests.Db2Client
 	[TestFixture]
 	public class Db2ConnectionTest
 	{
-		internal const string ConnectionString = "Driver={IBM DB2 ODBC DRIVER};DataBase=DB1; HostName=192.168.72.135; Protocol=TCPIP;Port=50000;Uid=root;Pwd=password;CurrentSchema=DB01;DB2NETNamedParam=1;HostVarParameters=1";
+		[SetUp]
+		public void SetUp()
+		{
+			Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+			Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+		}
+
+		[Test]
+		public void BasicLifecycle(
+			[Values("jdbc")] string type)
+		{
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				var conn = db as DbConnection;
+				Assert.That(conn, Is.Not.Null);
+
+				bool eventOpen = false, eventClosed = false;
+				conn.StateChange += (s, e) =>
+				{
+					if (e.OriginalState == ConnectionState.Closed && e.CurrentState == ConnectionState.Open)
+						eventOpen = true;
+					if (e.OriginalState == ConnectionState.Open && e.CurrentState == ConnectionState.Closed)
+						eventClosed = true;
+				};
+
+				Assert.That(conn.State, Is.EqualTo(ConnectionState.Closed));
+
+				conn.Open();
+				Assert.That(conn.State, Is.EqualTo(ConnectionState.Open));
+				Assert.That(eventOpen, Is.True);
+
+
+				conn.Close();
+				Assert.That(conn.State, Is.EqualTo(ConnectionState.Closed));
+				Assert.That(eventClosed, Is.True);
+
+				eventOpen = eventClosed = false;
+				conn.Open();
+				Assert.That(conn.State, Is.EqualTo(ConnectionState.Open));
+			}
+		}
+
 
 		[Test]
 		public void TestSelectAndRead(
+			[Values("odbc", "jdbc")] string type,
 			[Values("It is work", "Any simple string")] string name)
 		{
 			string d;
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var command = db.CreateCommand())
@@ -32,12 +77,13 @@ namespace Wintegra.Data.Tests.Db2Client
 		
 		[Test]
 		public void TestSetConnectionStringAndRead(
+			[Values("odbc", "jdbc")] string type,
 			[Values("It is work", "Any simple string")] string name)
 		{
 			string d;
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection())
+			using (var db = Db2Driver.GetDbConnectionWithConnectionString(type))
 			{
-				db.ConnectionString = ConnectionString;
+				db.ConnectionString = Db2Driver.GetConnectionString(type);
 				db.Open();
 				using (var command = db.CreateCommand())
 				{
@@ -56,11 +102,12 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestSelectWhereAndRead(
+			[Values("odbc", "jdbc")] string type,
 			[Values("It is work", "Any simple string")] string name,
-			[Values("@ID", "@1")] string parameterName)
+			[Values(":ID", ":1")] string parameterName)
 		{
 			string d;
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var command = db.CreateCommand())

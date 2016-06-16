@@ -51,6 +51,7 @@
     <Compile Include="Db2Client\DapperTest.cs" />
     <Compile Include="Db2Client\Db2ConnectionTest.cs" />
     <Compile Include="Db2Client\Db2DataReaderTest.cs" />
+    <Compile Include="Db2Client\Db2Driver.cs" />
     <Compile Include="Db2Client\Db2MuiltiQueryTest.cs" />
     <Compile Include="Db2Client\Utility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

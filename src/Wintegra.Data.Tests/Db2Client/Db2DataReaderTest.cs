@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data;
+using System.Globalization;
 using System.Text;
+using System.Threading;
 using System.Xml;
 using NUnit.Framework;
 
@@ -9,12 +11,20 @@ namespace Wintegra.Data.Tests.Db2Client
 	[TestFixture]
 	public class Db2DataReaderTest
 	{
+		[SetUp]
+		public void SetUp()
+		{
+			Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+			Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+		}
+
 		[Test]
 		public void TestWriteAndReadClob(
+			[Values("odbc", "jdbc")] string type,
 			[Values(1024, 4096, 8192, 65536, 1048576, 4194304)] int length)
 		{
 			string clob = Utility.RandomString(length);
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
@@ -22,14 +32,15 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE(CLOB_TEXT) VALUES(?)";
+						command.CommandText = "INSERT INTO DBG_TABLE(CLOB_TEXT) VALUES(:CLOB_TEXT)";
 
 						IDbDataParameter parameterObject = command.CreateParameter();
-						parameterObject.ParameterName = "1";
+						parameterObject.ParameterName = "CLOB_TEXT";
 						parameterObject.Value = clob;
 						command.Parameters.Add(parameterObject);
 
-						command.ExecuteNonQuery();
+						var rowCount =command.ExecuteNonQuery();
+						Assert.That(rowCount, Is.EqualTo(1));
 					}
 
 					using (var command = db.CreateCommand())
@@ -50,9 +61,9 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullClob()
+		public void TestReadNullClob([Values("odbc", "jdbc")] string type)
 		{
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
@@ -60,7 +71,7 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE(DBCLOB_TEXT) VALUES('clob is null')";
+						command.CommandText = "INSERT INTO DB01.DBG_TABLE(DBCLOB_TEXT) VALUES('clob is null')";
 
 						command.ExecuteNonQuery();
 					}
@@ -87,10 +98,11 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadDbclob(
+			[Values("odbc", "jdbc")] string type,
 			[Values(1024, 4096, 8192, 65536, 1048576, 4194304)] int length)
 		{
 			string dbclob = Utility.RandomString(length);
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
@@ -98,10 +110,10 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE(DBCLOB_TEXT) VALUES(?)";
+						command.CommandText = "INSERT INTO DBG_TABLE(DBCLOB_TEXT) VALUES(:DBCLOB_TEXT)";
 
 						IDbDataParameter parameterObject = command.CreateParameter();
-						parameterObject.ParameterName = "1";
+						parameterObject.ParameterName = "DBCLOB_TEXT";
 						parameterObject.Value = dbclob;
 						command.Parameters.Add(parameterObject);
 
@@ -126,9 +138,9 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullDbclob()
+		public void TestReadNullDbclob([Values("odbc", "jdbc")] string type)
 		{
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
@@ -163,10 +175,11 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadBlob(
+			[Values("odbc", "jdbc")] string type,
 			[Values(1024, 4096, 8192, 65536, 1048576, 4194304)] int length)
 		{
 			byte[] blob = Encoding.UTF8.GetBytes(Utility.RandomString(length));
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
@@ -174,10 +187,10 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE(BLOB_DATA) VALUES(?)";
+						command.CommandText = "INSERT INTO DBG_TABLE(BLOB_DATA) VALUES(:BLOB_DATA)";
 
 						IDbDataParameter parameterObject = command.CreateParameter();
-						parameterObject.ParameterName = "1";
+						parameterObject.ParameterName = "BLOB_DATA";
 						parameterObject.Value = blob;
 						command.Parameters.Add(parameterObject);
 
@@ -202,9 +215,9 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullBlob()
+		public void TestReadNullBlob([Values("odbc", "jdbc")] string type)
 		{
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
@@ -238,22 +251,28 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestWriteAndReadXml()
+		public void TestWriteAndReadXml(
+			[Values("odbc", "jdbc")] string type,
+			[Values(1024, 4096, 8192, 65536, 1048576, 4194304)] int length)
 		{
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			var d = new XmlObjectData()
 			{
-				var xml = db.ToXmlDocument();
+				Field = Utility.RandomString(length),
+			};
+			var xml = d.ToXmlDocument();
 
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
 				{
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE(XML_BODY) VALUES(?)";
+						command.CommandText = "INSERT INTO DBG_TABLE(XML_BODY) VALUES(:XML_BODY)";
 
 						IDbDataParameter parameterObject = command.CreateParameter();
-						parameterObject.ParameterName = "1";
+						parameterObject.ParameterName = "XML_BODY";
 						parameterObject.Value = xml;
 						command.Parameters.Add(parameterObject);
 
@@ -283,9 +302,9 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullXml()
+		public void TestReadNullXml([Values("odbc", "jdbc")] string type)
 		{
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
