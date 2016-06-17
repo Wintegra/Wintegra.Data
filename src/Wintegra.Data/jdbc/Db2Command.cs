@@ -152,7 +152,7 @@ namespace Wintegra.Data.jdbc
 			again:
 				if (obj is byte[])
 				{
-					stmt.setObject(name, obj);
+					stmt.setBytes(name, (byte[])obj);
 				}
 				else if (obj is XmlDocument)
 				{
@@ -185,6 +185,10 @@ namespace Wintegra.Data.jdbc
 					obj = ((XmlElement)obj).OwnerDocument; // compatible with Dapper
 					name = name.Substring(0, name.Length - 1);
 					goto again;
+				}
+				else if (obj is char)
+				{
+					stmt.setString(name, obj.ToString());
 				}
 				else
 				{

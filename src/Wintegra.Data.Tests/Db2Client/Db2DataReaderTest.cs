@@ -18,6 +18,12 @@ namespace Wintegra.Data.Tests.Db2Client
 			Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
 		}
 
+		#region String data types
+
+		// CHARACTER
+		// VARCHAR
+
+		#region CLOB
 		[Test]
 		public void TestWriteAndReadClob(
 			[Values("odbc", "jdbc")] string type,
@@ -32,21 +38,21 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE(CLOB_TEXT) VALUES(:CLOB_TEXT)";
+						command.CommandText = "INSERT INTO DBG_TABLE_CLOB(FIELD) VALUES(:FIELD)";
 
 						IDbDataParameter parameterObject = command.CreateParameter();
-						parameterObject.ParameterName = "CLOB_TEXT";
+						parameterObject.ParameterName = "FIELD";
 						parameterObject.Value = clob;
 						command.Parameters.Add(parameterObject);
 
-						var rowCount =command.ExecuteNonQuery();
+						var rowCount = command.ExecuteNonQuery();
 						Assert.That(rowCount, Is.EqualTo(1));
 					}
 
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "SELECT CLOB_TEXT FROM DBG_TABLE";
+						command.CommandText = "SELECT FIELD FROM DBG_TABLE_CLOB";
 
 						using (var reader = command.ExecuteReader())
 						{
@@ -54,7 +60,7 @@ namespace Wintegra.Data.Tests.Db2Client
 							Assert.That(reader.GetValue(0), Is.EqualTo(clob));
 							Assert.That(reader.NextResult(), Is.False);
 						}
-						
+
 					}
 				}
 			}
@@ -63,6 +69,8 @@ namespace Wintegra.Data.Tests.Db2Client
 		[Test]
 		public void TestReadNullClob([Values("odbc", "jdbc")] string type)
 		{
+			char ch = Utility.RandomAsciiChar();
+
 			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
@@ -71,7 +79,7 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DB01.DBG_TABLE(DBCLOB_TEXT) VALUES('clob is null')";
+						command.CommandText = "INSERT INTO DBG_TABLE_CLOB(EMPTY) VALUES('" + ch + "')";
 
 						command.ExecuteNonQuery();
 					}
@@ -79,14 +87,14 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "SELECT DBCLOB_TEXT, CLOB_TEXT FROM DBG_TABLE";
+						command.CommandText = "SELECT EMPTY, FIELD FROM DBG_TABLE_CLOB";
 
 						using (var reader = command.ExecuteReader())
 						{
 							Assert.That(reader.Read(), Is.True);
-							var msg = (String)reader.GetValue(0);
+							var msg = reader.GetChar(0);
 							var actual = (String)reader.GetValue(1);
-							Assert.That(msg, Is.EqualTo("clob is null"));
+							Assert.That(msg, Is.EqualTo(ch));
 							Assert.That(actual, Is.Null);
 							Assert.That(reader.NextResult(), Is.False);
 						}
@@ -95,6 +103,13 @@ namespace Wintegra.Data.Tests.Db2Client
 				}
 			}
 		}
+
+		#endregion
+
+		// GRAPHIC
+		// VARGRAPHIC
+
+		#region DBCLOB
 
 		[Test]
 		public void TestWriteAndReadDbclob(
@@ -110,10 +125,10 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE(DBCLOB_TEXT) VALUES(:DBCLOB_TEXT)";
+						command.CommandText = "INSERT INTO DBG_TABLE_DBCLOB(FIELD) VALUES(:FIELD)";
 
 						IDbDataParameter parameterObject = command.CreateParameter();
-						parameterObject.ParameterName = "DBCLOB_TEXT";
+						parameterObject.ParameterName = "FIELD";
 						parameterObject.Value = dbclob;
 						command.Parameters.Add(parameterObject);
 
@@ -123,7 +138,7 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "SELECT DBCLOB_TEXT FROM DBG_TABLE";
+						command.CommandText = "SELECT FIELD FROM DBG_TABLE_DBCLOB";
 
 						using (var reader = command.ExecuteReader())
 						{
@@ -131,7 +146,7 @@ namespace Wintegra.Data.Tests.Db2Client
 							Assert.That(reader.GetValue(0), Is.EqualTo(dbclob));
 							Assert.That(reader.NextResult(), Is.False);
 						}
-						
+
 					}
 				}
 			}
@@ -140,6 +155,8 @@ namespace Wintegra.Data.Tests.Db2Client
 		[Test]
 		public void TestReadNullDbclob([Values("odbc", "jdbc")] string type)
 		{
+			char ch = Utility.RandomAsciiChar();
+
 			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
@@ -148,7 +165,7 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE(CLOB_TEXT) VALUES('dbclob is null')";
+						command.CommandText = "INSERT INTO DBG_TABLE_DBCLOB(EMPTY) VALUES('" + ch + "')";
 
 						command.ExecuteNonQuery();
 					}
@@ -156,14 +173,14 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "SELECT CLOB_TEXT, DBCLOB_TEXT FROM DBG_TABLE";
+						command.CommandText = "SELECT EMPTY, FIELD FROM DBG_TABLE_DBCLOB";
 
 						using (var reader = command.ExecuteReader())
 						{
 							Assert.That(reader.Read(), Is.True);
-							var msg = (String)reader.GetValue(0);
+							var msg = reader.GetChar(0);
 							var actual = (String)reader.GetValue(1);
-							Assert.That(msg, Is.EqualTo("dbclob is null"));
+							Assert.That(msg, Is.EqualTo(ch));
 							Assert.That(actual, Is.Null);
 							Assert.That(reader.NextResult(), Is.False);
 						}
@@ -172,6 +189,10 @@ namespace Wintegra.Data.Tests.Db2Client
 				}
 			}
 		}
+
+		#endregion
+
+		#region BLOB
 
 		[Test]
 		public void TestWriteAndReadBlob(
@@ -187,10 +208,10 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE(BLOB_DATA) VALUES(:BLOB_DATA)";
+						command.CommandText = "INSERT INTO DBG_TABLE_BLOB(FIELD) VALUES(:FIELD)";
 
 						IDbDataParameter parameterObject = command.CreateParameter();
-						parameterObject.ParameterName = "BLOB_DATA";
+						parameterObject.ParameterName = "FIELD";
 						parameterObject.Value = blob;
 						command.Parameters.Add(parameterObject);
 
@@ -200,7 +221,7 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "SELECT BLOB_DATA FROM DBG_TABLE";
+						command.CommandText = "SELECT FIELD FROM DBG_TABLE_BLOB";
 
 						using (var reader = command.ExecuteReader())
 						{
@@ -208,7 +229,7 @@ namespace Wintegra.Data.Tests.Db2Client
 							Assert.That(reader.GetValue(0), Is.EqualTo(blob));
 							Assert.That(reader.NextResult(), Is.False);
 						}
-						
+
 					}
 				}
 			}
@@ -217,6 +238,8 @@ namespace Wintegra.Data.Tests.Db2Client
 		[Test]
 		public void TestReadNullBlob([Values("odbc", "jdbc")] string type)
 		{
+			char ch = Utility.RandomAsciiChar();
+
 			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
@@ -225,7 +248,7 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE(CLOB_TEXT) VALUES('blob is null')";
+						command.CommandText = "INSERT INTO DBG_TABLE_BLOB(EMPTY) VALUES('" + ch + "')";
 
 						command.ExecuteNonQuery();
 					}
@@ -233,14 +256,14 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "SELECT CLOB_TEXT, BLOB_DATA FROM DBG_TABLE";
+						command.CommandText = "SELECT EMPTY, FIELD FROM DBG_TABLE_BLOB";
 
 						using (var reader = command.ExecuteReader())
 						{
 							Assert.That(reader.Read(), Is.True);
-							var msg = (String)reader.GetValue(0);
+							var msg = reader.GetChar(0);
 							var actual = (byte[])reader.GetValue(1);
-							Assert.That(msg, Is.EqualTo("blob is null"));
+							Assert.That(msg, Is.EqualTo(ch));
 							Assert.That(actual, Is.Null);
 							Assert.That(reader.NextResult(), Is.False);
 						}
@@ -249,6 +272,31 @@ namespace Wintegra.Data.Tests.Db2Client
 				}
 			}
 		}
+
+		#endregion
+
+		#endregion
+		#region Numeric data types
+
+		// SMALLINT
+		// INTEGER 
+		// BIGINT
+		// DECIMAL 
+		// DECFLOAT
+		// REAL
+		// DOUBLE
+
+		#endregion
+
+		#region Date, time, and timestamp data types
+
+		// DATE
+		// TIME
+		// TIMESTAMP
+
+		#endregion 
+
+		#region XML data type
 
 		[Test]
 		public void TestWriteAndReadXml(
@@ -269,10 +317,10 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE(XML_BODY) VALUES(:XML_BODY)";
+						command.CommandText = "INSERT INTO DBG_TABLE_XML(FIELD) VALUES(:FIELD)";
 
 						IDbDataParameter parameterObject = command.CreateParameter();
-						parameterObject.ParameterName = "XML_BODY";
+						parameterObject.ParameterName = "FIELD";
 						parameterObject.Value = xml;
 						command.Parameters.Add(parameterObject);
 
@@ -282,7 +330,7 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "SELECT XML_BODY FROM DBG_TABLE";
+						command.CommandText = "SELECT FIELD FROM DBG_TABLE_XML";
 
 						using (var reader = command.ExecuteReader())
 						{
@@ -290,7 +338,7 @@ namespace Wintegra.Data.Tests.Db2Client
 							XmlDocument actual = (XmlDocument)reader.GetValue(0);
 
 							Assert.That(actual.OuterXml
-								.Substring("<?xml version=\"1.0\" encoding=\"UTF-16\"?>".Length), 
+								.Substring("<?xml version=\"1.0\" encoding=\"UTF-16\"?>".Length),
 								Is.EqualTo(xml.OuterXml
 								.Substring("<?xml version=\"1.0\"?>".Length)));
 							Assert.That(reader.NextResult(), Is.False);
@@ -304,6 +352,8 @@ namespace Wintegra.Data.Tests.Db2Client
 		[Test]
 		public void TestReadNullXml([Values("odbc", "jdbc")] string type)
 		{
+			char ch = Utility.RandomAsciiChar();
+
 			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
@@ -312,7 +362,7 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE(CLOB_TEXT) VALUES('xml is null')";
+						command.CommandText = "INSERT INTO DBG_TABLE_XML(EMPTY) VALUES('" + ch + "')";
 
 						command.ExecuteNonQuery();
 					}
@@ -320,15 +370,15 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "SELECT CLOB_TEXT, XML_BODY FROM DBG_TABLE";
+						command.CommandText = "SELECT EMPTY, FIELD FROM DBG_TABLE_XML";
 
 						using (var reader = command.ExecuteReader())
 						{
 							Assert.That(reader.Read(), Is.True);
-							var msg = (String)reader.GetValue(0);
+							var msg = reader.GetChar(0);
 							XmlDocument actual = (XmlDocument)reader.GetValue(1);
 
-							Assert.That(msg, Is.EqualTo("xml is null"));
+							Assert.That(msg, Is.EqualTo(ch));
 							Assert.That(actual, Is.Null);
 							Assert.That(reader.NextResult(), Is.False);
 						}
@@ -337,5 +387,8 @@ namespace Wintegra.Data.Tests.Db2Client
 				}
 			}
 		}
+
+
+		#endregion
 	}
 }

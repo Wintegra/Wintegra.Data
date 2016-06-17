@@ -101,7 +101,14 @@ namespace Wintegra.Data.jdbc
 
 		public override char GetChar(int ordinal)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				return _rs.getString(ordinal + 1)[0];
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
 		}
 
 		public override long GetChars(int ordinal, long dataOffset, char[] buffer, int bufferOffset, int length)

@@ -11,6 +11,13 @@ namespace Wintegra.Data.Tests.Db2Client
 {
 	internal static class Utility
 	{
+		public static char RandomAsciiChar()
+		{
+			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			var random = new Random((int)DateTime.UtcNow.Ticks);
+			return chars[random.Next(chars.Length)];
+		}
+
 		public static string RandomString(int length)
 		{
 			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
@@ -84,12 +91,10 @@ namespace Wintegra.Data.Tests.Db2Client
 		public string Field { get; set; }
 	}
 
-	class DBG_TABLE
+	class DBG_TABLE<T>
 	{
-		public String CLOB_TEXT { get; set; }
-		public String DBCLOB_TEXT { get; set; }
-		public byte[] BLOB_DATA { get; set; }
-		public XmlDocument XML_BODY { get; set; }
+		public T FIELD { get; set; }
+		public char EMPTY { get; set; }
 	}
 
 	public class SqlQueryObject

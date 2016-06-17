@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Threading;
+using System.Xml;
 using Dapper;
 using NUnit.Framework;
 
@@ -17,6 +19,13 @@ namespace Wintegra.Data.Tests.Db2Client
 			Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
 		}
 
+		#region String data types
+
+		// CHARACTER
+		// VARCHAR
+
+		#region CLOB
+
 		[Test]
 		public void TestWriteAndReadClob(
 			[Values("odbc", "jdbc")] string type,
@@ -28,19 +37,15 @@ namespace Wintegra.Data.Tests.Db2Client
 				db.Open();
 				using (var tn = db.BeginTransaction())
 				{
-					db.Execute("INSERT INTO DBG_TABLE(CLOB_TEXT) VALUES(:CLOB_TEXT)", new { CLOB_TEXT = clob }, tn);
-					var list = db.QueryObjects<DBG_TABLE>("SELECT CLOB_TEXT FROM DBG_TABLE", new { }, tn);
+					db.Execute("INSERT INTO DBG_TABLE_CLOB(FIELD) VALUES(:CLOB_TEXT)", new { CLOB_TEXT = clob }, tn);
+					var list = db.QueryObjects<DBG_TABLE<String>>("SELECT FIELD FROM DBG_TABLE_CLOB", new { }, tn);
 
 					Assert.That(list, Is.Not.Null);
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
-					Assert.That(actual.CLOB_TEXT, Is.Not.Null);
-					Assert.That(actual.DBCLOB_TEXT, Is.Null);
-					Assert.That(actual.BLOB_DATA, Is.Null);
-					Assert.That(actual.XML_BODY, Is.Null);
-
-					Assert.That(actual.CLOB_TEXT, Is.EqualTo(clob));
+					Assert.That(actual.FIELD, Is.EqualTo(clob));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
 				}
 			}
 		}
@@ -48,25 +53,32 @@ namespace Wintegra.Data.Tests.Db2Client
 		[Test]
 		public void TestReadNullClob([Values("odbc", "jdbc")] string type)
 		{
+			char ch = Utility.RandomAsciiChar();
+
 			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
 				{
-					db.Execute("INSERT INTO DBG_TABLE(DBCLOB_TEXT) VALUES('clob is null')", new { }, tn);
-					var list = db.QueryObjects<DBG_TABLE>("SELECT DBCLOB_TEXT, CLOB_TEXT FROM DBG_TABLE", new { }, tn);
+					db.Execute("INSERT INTO DBG_TABLE_CLOB(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<String>>("SELECT FIELD, EMPTY FROM DBG_TABLE_CLOB", new { }, tn);
 
 					Assert.That(list, Is.Not.Null);
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
-					Assert.That(actual.CLOB_TEXT, Is.Null);
-					Assert.That(actual.DBCLOB_TEXT, Is.EqualTo("clob is null"));
-					Assert.That(actual.BLOB_DATA, Is.Null);
-					Assert.That(actual.XML_BODY, Is.Null);
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
 				}
 			}
 		}
+
+		#endregion
+
+		// GRAPHIC
+		// VARGRAPHIC
+
+		#region DBCLOB
 
 		[Test]
 		public void TestWriteAndReadDbclob(
@@ -79,19 +91,15 @@ namespace Wintegra.Data.Tests.Db2Client
 				db.Open();
 				using (var tn = db.BeginTransaction())
 				{
-					db.Execute("INSERT INTO DBG_TABLE(DBCLOB_TEXT) VALUES(:DBCLOB_TEXT)", new { DBCLOB_TEXT = dbclob }, tn);
-					var list = db.QueryObjects<DBG_TABLE>("SELECT DBCLOB_TEXT FROM DBG_TABLE", new { }, tn);
+					db.Execute("INSERT INTO DBG_TABLE_DBCLOB(FIELD) VALUES(:DBCLOB_TEXT)", new { DBCLOB_TEXT = dbclob }, tn);
+					var list = db.QueryObjects<DBG_TABLE<String>>("SELECT FIELD FROM DBG_TABLE_DBCLOB", new { }, tn);
 
 					Assert.That(list, Is.Not.Null);
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
-					Assert.That(actual.CLOB_TEXT, Is.Null);
-					Assert.That(actual.DBCLOB_TEXT, Is.Not.Null);
-					Assert.That(actual.BLOB_DATA, Is.Null);
-					Assert.That(actual.XML_BODY, Is.Null);
-
-					Assert.That(actual.DBCLOB_TEXT, Is.EqualTo(dbclob));
+					Assert.That(actual.FIELD, Is.EqualTo(dbclob));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
 				}
 			}
 		}
@@ -99,25 +107,29 @@ namespace Wintegra.Data.Tests.Db2Client
 		[Test]
 		public void TestReadNullDbclob([Values("odbc", "jdbc")] string type)
 		{
+			char ch = Utility.RandomAsciiChar();
+
 			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
 				{
-					db.Execute("INSERT INTO DBG_TABLE(CLOB_TEXT) VALUES('dbclob is null')", new { }, tn);
-					var list = db.QueryObjects<DBG_TABLE>("SELECT CLOB_TEXT, DBCLOB_TEXT FROM DBG_TABLE", new { }, tn);
+					db.Execute("INSERT INTO DBG_TABLE_DBCLOB(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<String>>("SELECT FIELD, EMPTY FROM DBG_TABLE_DBCLOB", new { }, tn);
 
 					Assert.That(list, Is.Not.Null);
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
-					Assert.That(actual.CLOB_TEXT, Is.EqualTo("dbclob is null"));
-					Assert.That(actual.DBCLOB_TEXT, Is.Null);
-					Assert.That(actual.BLOB_DATA, Is.Null);
-					Assert.That(actual.XML_BODY, Is.Null);
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
 				}
 			}
 		}
+
+		#endregion
+
+		#region BLOB
 
 		[Test]
 		public void TestWriteAndReadBlob(
@@ -130,19 +142,15 @@ namespace Wintegra.Data.Tests.Db2Client
 				db.Open();
 				using (var tn = db.BeginTransaction())
 				{
-					db.Execute("INSERT INTO DBG_TABLE(BLOB_DATA) VALUES(:BLOB_DATA)", new { BLOB_DATA = blob }, tn);
-					var list = db.QueryObjects<DBG_TABLE>("SELECT BLOB_DATA FROM DBG_TABLE", new { }, tn);
+					db.Execute("INSERT INTO DBG_TABLE_BLOB(FIELD) VALUES(:BLOB_DATA)", new { BLOB_DATA = blob }, tn);
+					var list = db.QueryObjects<DBG_TABLE<byte[]>>("SELECT FIELD FROM DBG_TABLE_BLOB", new { }, tn);
 
 					Assert.That(list, Is.Not.Null);
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
-					Assert.That(actual.CLOB_TEXT, Is.Null);
-					Assert.That(actual.DBCLOB_TEXT, Is.Null);
-					Assert.That(actual.BLOB_DATA, Is.Not.Null);
-					Assert.That(actual.XML_BODY, Is.Null);
-
-					Assert.That(actual.BLOB_DATA, Is.EqualTo(blob));
+					Assert.That(actual.FIELD, Is.EqualTo(blob));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
 				}
 			}
 		}
@@ -150,25 +158,52 @@ namespace Wintegra.Data.Tests.Db2Client
 		[Test]
 		public void TestReadNullBlob([Values("odbc", "jdbc")] string type)
 		{
+			char ch = Utility.RandomAsciiChar();
+
 			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
 				{
-					db.Execute("INSERT INTO DBG_TABLE(CLOB_TEXT) VALUES('blob is null')", new { }, tn);
-					var list = db.QueryObjects<DBG_TABLE>("SELECT CLOB_TEXT, BLOB_DATA FROM DBG_TABLE", new { }, tn);
+					db.Execute("INSERT INTO DBG_TABLE_BLOB(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<byte[]>>("SELECT FIELD, EMPTY FROM DBG_TABLE_BLOB", new { }, tn);
 
 					Assert.That(list, Is.Not.Null);
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
-					Assert.That(actual.CLOB_TEXT, Is.EqualTo("blob is null"));
-					Assert.That(actual.DBCLOB_TEXT, Is.Null);
-					Assert.That(actual.BLOB_DATA, Is.Null);
-					Assert.That(actual.XML_BODY, Is.Null);
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
 				}
 			}
 		}
+
+
+		#endregion
+
+		#endregion
+
+		#region Numeric data types
+
+		// SMALLINT
+		// INTEGER 
+		// BIGINT
+		// DECIMAL 
+		// DECFLOAT
+		// REAL
+		// DOUBLE
+
+		#endregion
+
+		#region Date, time, and timestamp data types
+
+		// DATE
+		// TIME
+		// TIMESTAMP
+
+		#endregion
+
+		#region XML data type
 
 		private static readonly List<SqlQueryObject> DapperSet = new List<SqlQueryObject>()
 		{
@@ -200,20 +235,18 @@ namespace Wintegra.Data.Tests.Db2Client
 				db.Open();
 				using (var tn = db.BeginTransaction())
 				{
-					db.Execute("INSERT INTO DBG_TABLE(XML_BODY) VALUES(:XML_BODY)", new { XML_BODY = xml }, tn);
-					var list = db.QueryObjects<DBG_TABLE>("SELECT XML_BODY FROM DBG_TABLE", new { }, tn);
+					db.Execute("INSERT INTO DBG_TABLE_XML(FIELD) VALUES(:XML_BODY)", new { XML_BODY = xml }, tn);
+					var list = db.QueryObjects<DBG_TABLE<XmlDocument>>("SELECT FIELD FROM DBG_TABLE_XML", new { }, tn);
 
 					Assert.That(list, Is.Not.Null);
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
-					Assert.That(actual.CLOB_TEXT, Is.Null);
-					Assert.That(actual.DBCLOB_TEXT, Is.Null);
-					Assert.That(actual.BLOB_DATA, Is.Null);
-					Assert.That(actual.XML_BODY, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
 
 
-					Assert.That(actual.XML_BODY.OuterXml
+					Assert.That(actual.FIELD.OuterXml
 						.Substring("<?xml version=\"1.0\" encoding=\"UTF-16\"?>".Length),
 						Is.EqualTo(xml.OuterXml
 						.Substring("<?xml version=\"1.0\"?>".Length)));
@@ -224,24 +257,26 @@ namespace Wintegra.Data.Tests.Db2Client
 		[Test]
 		public void TestReadNullXml([Values("odbc", "jdbc")] string type)
 		{
+			char ch = Utility.RandomAsciiChar();
+
 			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
 				{
-					db.Execute("INSERT INTO DBG_TABLE(CLOB_TEXT) VALUES('xml is null')", new { }, tn);
-					var list = db.QueryObjects<DBG_TABLE>("SELECT CLOB_TEXT, XML_BODY FROM DBG_TABLE", new { }, tn);
+					db.Execute("INSERT INTO DBG_TABLE_XML(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<XmlDocument>>("SELECT FIELD, EMPTY FROM DBG_TABLE_XML", new { }, tn);
 
 					Assert.That(list, Is.Not.Null);
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
-					Assert.That(actual.CLOB_TEXT, Is.EqualTo("xml is null"));
-					Assert.That(actual.DBCLOB_TEXT, Is.Null);
-					Assert.That(actual.BLOB_DATA, Is.Null);
-					Assert.That(actual.XML_BODY, Is.Null);
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
 				}
 			}
 		}
+
+		#endregion
 	}
 }

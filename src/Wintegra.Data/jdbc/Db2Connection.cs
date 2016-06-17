@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
-using com.ibm.db2.jcc.am;
 using Thread = java.lang.Thread;
 using Class = java.lang.Class;
 using DriverManager = java.sql.DriverManager;
