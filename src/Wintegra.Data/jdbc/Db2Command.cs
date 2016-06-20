@@ -190,9 +190,45 @@ namespace Wintegra.Data.jdbc
 				{
 					stmt.setString(name, obj.ToString());
 				}
-				else
+				else if (obj is string)
 				{
 					stmt.setString(name, (string)obj);
+				}
+				else if (obj is short)
+				{
+					stmt.setShort(name, (short)obj);
+				}
+				else if (obj is int)
+				{
+					stmt.setInt(name, (int)obj);
+				}
+				else if (obj is long)
+				{
+					stmt.setLong(name, (long)obj);
+				}
+				else if (obj is decimal)
+				{
+					stmt.setBigDecimal(name, ((decimal)obj).toBigDecimal());
+				}
+				else if (obj is float)
+				{
+					stmt.setFloat(name, (float)obj);
+				}
+				else if (obj is double)
+				{
+					stmt.setDouble(name, (double)obj);
+				}
+				else if (obj is TimeSpan)
+				{
+					stmt.setTime(name, ((TimeSpan)obj).toTime());
+				}
+				else if (obj is DateTime)
+				{
+					stmt.setTimestamp(name, ((DateTime)obj).toTimestamp());
+				}
+				else
+				{
+					stmt.setObject(name, obj);
 				}
 			}
 			return stmt;

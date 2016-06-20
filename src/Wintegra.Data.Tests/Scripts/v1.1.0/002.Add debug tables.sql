@@ -84,7 +84,7 @@ CREATE TABLE "DBG_TABLE_DECIMAL"  (
         -- The range of a decimal variable or the numbers in a decimal column is -n to +n, 
         --  where n is the largest positive number that can be represented with the applicable precision and scale. 
         -- The maximum range is 1 - 10³¹ to 10³¹ - 1.
-        "FIELD"     DECIMAL,
+        "FIELD"     DECIMAL(31,7),
         "EMPTY"     CHARACTER(1)
 )
 GO
@@ -94,7 +94,7 @@ CREATE TABLE "DBG_TABLE_DECFLOAT"  (
         -- The maximum precision is 34 digits.
         -- The range of a decimal floating-point number is either 16 or 34 digits of precision; 
         --  the exponent range is respectively 10-383 to 10+384 or 10-6143 to 10+6144.
-        "FIELD"     DECFLOAT,
+        "FIELD"     DECFLOAT(34),
         "EMPTY"     CHARACTER(1)
 )
 GO

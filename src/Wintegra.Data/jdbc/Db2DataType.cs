@@ -6,6 +6,10 @@
 
 		Binary = 1,
 
+		Int16 = 10,
+		Int32 = 11,
+		Int64 = 12,
+
 		String = 16,
 	}
 }

@@ -21,8 +21,109 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		#region String data types
 
-		// CHARACTER
-		// VARCHAR
+		#region CHARACTER
+
+		[Test]
+		public void TestWriteAndReadCharacter(
+			[Values("odbc", "jdbc")] string type,
+			[Values(1, 4, 64, 254)] int length)
+		{
+			string character = Utility.RandomAsciiString(length);
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_CHARACTER(FIELD) VALUES(:CHARACTER_STRING)", new { CHARACTER_STRING = character }, tn);
+					var list = db.QueryObjects<DBG_TABLE<String>>("SELECT FIELD FROM DBG_TABLE_CHARACTER", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD.Length, Is.EqualTo(Utility.FieldCharacterSize));
+					Assert.That(actual.FIELD, Does.StartWith(character));
+					Assert.That(actual.FIELD, Is.EqualTo(character + new String(' ', Utility.FieldCharacterSize - character.Length)));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullCharacter([Values("odbc", "jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_CHARACTER(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<String>>("SELECT FIELD, EMPTY FROM DBG_TABLE_CHARACTER", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
+
+		#region VARCHAR
+
+		[Test]
+		public void TestWriteAndReadVarchar(
+			[Values("odbc", "jdbc")] string type,
+			[Values(1, 4, 64, 254)] int length)
+		{
+			string varchar = Utility.RandomAsciiString(length);
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_VARCHAR(FIELD) VALUES(:VARCHAR_STRING)", new { VARCHAR_STRING = varchar }, tn);
+					var list = db.QueryObjects<DBG_TABLE<String>>("SELECT FIELD FROM DBG_TABLE_VARCHAR", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.EqualTo(varchar));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullVarchar([Values("odbc", "jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_VARCHAR(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<String>>("SELECT FIELD, EMPTY FROM DBG_TABLE_VARCHAR", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
 
 		#region CLOB
 
@@ -75,8 +176,109 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		#endregion
 
-		// GRAPHIC
-		// VARGRAPHIC
+		#region GRAPHIC
+
+		[Test]
+		public void TestWriteAndReadGraphic(
+			[Values("odbc", "jdbc")] string type,
+			[Values(1, 4, 64, 127)] int length)
+		{
+			string graphic = Utility.RandomAsciiString(length);
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_GRAPHIC(FIELD) VALUES(:GRAPHIC_STRING)", new { GRAPHIC_STRING = graphic }, tn);
+					var list = db.QueryObjects<DBG_TABLE<String>>("SELECT FIELD FROM DBG_TABLE_GRAPHIC", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD.Length, Is.EqualTo(Utility.FieldGraphicSize));
+					Assert.That(actual.FIELD, Does.StartWith(graphic));
+					Assert.That(actual.FIELD, Is.EqualTo(graphic + new String(' ', Utility.FieldGraphicSize - graphic.Length)));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullGraphic([Values("odbc", "jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_GRAPHIC(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<String>>("SELECT FIELD, EMPTY FROM DBG_TABLE_GRAPHIC", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
+
+		#region VARGRAPHIC
+
+		[Test]
+		public void TestWriteAndReadVargraphic(
+			[Values("odbc", "jdbc")] string type,
+			[Values(1, 4, 64, 1024)] int length)
+		{
+			string vargraphic = Utility.RandomAsciiString(length);
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_VARGRAPHIC(FIELD) VALUES(:VARGRAPHIC_STRING)", new { VARGRAPHIC_STRING = vargraphic }, tn);
+					var list = db.QueryObjects<DBG_TABLE<String>>("SELECT FIELD FROM DBG_TABLE_VARGRAPHIC", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.EqualTo(vargraphic));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullVargraphic([Values("odbc", "jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_VARGRAPHIC(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<String>>("SELECT FIELD, EMPTY FROM DBG_TABLE_VARGRAPHIC", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
 
 		#region DBCLOB
 
@@ -185,7 +387,56 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		#region Numeric data types
 
-		// SMALLINT
+		#region SMALLINT
+
+		[Test]
+		public void TestWriteAndReadSmallint(
+			[Values("odbc", "jdbc")] string type,
+			[Values(short.MinValue, -1, 0, 1, short.MaxValue)] short value)
+		{
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_SMALLINT(FIELD) VALUES(:INT16)", new { INT16 = value }, tn);
+					var list = db.QueryObjects<DBG_TABLE<short?>>("SELECT FIELD FROM DBG_TABLE_SMALLINT", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.EqualTo(value));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullSmallint([Values("odbc", "jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_SMALLINT(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<short?>>("SELECT FIELD, EMPTY FROM DBG_TABLE_SMALLINT", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
+
 		// INTEGER 
 		// BIGINT
 		// DECIMAL 

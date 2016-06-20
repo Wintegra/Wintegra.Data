@@ -5,13 +5,30 @@ using System.Data.Common;
 using System.Xml;
 using Statement = java.sql.Statement;
 using ResultSet = java.sql.ResultSet;
-using ResultSetMetaData = java.sql.ResultSetMetaData;
 using SQLException = java.sql.SQLException;
 
 namespace Wintegra.Data.jdbc
 {
 	internal sealed class Db2DataReader : DbDataReader
 	{
+		enum ColumnDb2TypeEnum
+		{
+			Default = 0,
+			Blob,
+			Clob,
+			Xml,
+			Int16,
+			Int32,
+			Int64,
+			Decimal,
+			Float,
+			Double,
+			Time,
+			Date,
+			Timestamp,
+		}
+
+
 		private bool _disposed = false;
 		private readonly Statement _statement;
 		private ResultSet _rs;
@@ -74,10 +91,7 @@ namespace Wintegra.Data.jdbc
 			get { throw new NotImplementedException(); }
 		}
 
-		public override bool IsClosed
-		{
-			get { throw new NotImplementedException(); }
-		}
+		public override bool IsClosed { get { return (_rs == null) || _rs.isClosed(); } }
 
 		public override int RecordsAffected
 		{
@@ -86,12 +100,26 @@ namespace Wintegra.Data.jdbc
 
 		public override bool GetBoolean(int ordinal)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				return _rs.getBoolean(ordinal + 1);
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
 		}
 
 		public override byte GetByte(int ordinal)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				return _rs.getByte(ordinal + 1);
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
 		}
 
 		public override long GetBytes(int ordinal, long dataOffset, byte[] buffer, int bufferOffset, int length)
@@ -123,22 +151,124 @@ namespace Wintegra.Data.jdbc
 
 		public override short GetInt16(int ordinal)
 		{
-			throw new NotImplementedException();
+			var d = GetShort(ordinal);
+			if (!d.HasValue) throw new NullReferenceException("DB2 returned null");
+			return d.Value;
+		}
+
+		public short? GetShort(int ordinal)
+		{
+			try
+			{
+				var obj = _rs.getObject(ordinal + 1);
+				{
+					var value = obj as java.lang.Short;
+					if (value != null) return value.shortValue();
+				}
+				{
+					// !! important JDBC returns Int32
+					var value = obj as java.lang.Integer;
+					if (value != null) return value.shortValue();
+				}
+
+
+				return null;
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
 		}
 
 		public override int GetInt32(int ordinal)
 		{
-			throw new NotImplementedException();
+			var d = GetInteger(ordinal);
+			if (!d.HasValue) throw new NullReferenceException("DB2 returned null");
+			return d.Value;
+		}
+
+		public int? GetInteger(int ordinal)
+		{
+			try
+			{
+				var obj = _rs.getObject(ordinal + 1);
+				var value = obj as java.lang.Integer;
+				if (value != null) return value.intValue();
+
+				return null;
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
 		}
 
 		public override long GetInt64(int ordinal)
 		{
-			throw new NotImplementedException();
+			var d = GetLong(ordinal);
+			if (!d.HasValue) throw new NullReferenceException("DB2 returned null");
+			return d.Value;
+		}
+
+		public long? GetLong(int ordinal)
+		{
+			try
+			{
+				var obj = _rs.getObject(ordinal + 1);
+				var value = obj as java.lang.Long;
+				if (value != null) return value.longValue();
+
+				return null;
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
 		}
 
 		public override DateTime GetDateTime(int ordinal)
 		{
-			throw new NotImplementedException();
+			var d = GetDateTimeOrNull(ordinal);
+			if (!d.HasValue) throw new NullReferenceException("DB2 returned null");
+			return d.Value;
+		}
+
+		public DateTime? GetDateTimeOrNull(int ordinal)
+		{
+			try
+			{
+				var obj = _rs.getObject(ordinal + 1);
+				{
+					var value = obj as java.sql.Date;
+					if (value != null) return value.ToDateTime();
+				}
+				{
+					var value = obj as java.sql.Timestamp;
+					if (value != null) return value.ToDateTime();
+				}
+
+				return null;
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
+		}
+
+		public TimeSpan? GetTime(int ordinal)
+		{
+			try
+			{
+				var obj = _rs.getObject(ordinal + 1);
+				var value = obj as java.sql.Time;
+				if (value != null) return value.ToTimeSpan();
+
+				return null;
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
 		}
 
 		public override string GetString(int ordinal)
@@ -153,18 +283,127 @@ namespace Wintegra.Data.jdbc
 			}
 		}
 
+		public override decimal GetDecimal(int ordinal)
+		{
+			var d = GetBigDecimal(ordinal);
+			if (!d.HasValue) throw new NullReferenceException("DB2 returned null");
+			return (decimal)d.Value;
+		}
+
+		private decimal? GetBigDecimal(int ordinal)
+		{
+			try
+			{
+				var obj = _rs.getObject(ordinal + 1);
+				var value = obj as java.math.BigDecimal;
+				if (value != null) return value.ToDecimal();
+
+				return null;
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
+		}
+
+		public override float GetFloat(int ordinal)
+		{
+			var d = GetReal(ordinal);
+			if (!d.HasValue) throw new NullReferenceException("DB2 returned null");
+			return d.Value;
+		}
+
+		private float? GetReal(int ordinal)
+		{
+			try
+			{
+				var obj = _rs.getObject(ordinal + 1);
+				var value = obj as java.lang.Float;
+				if (value != null) return value.floatValue();
+
+				return null;
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
+		}
+
+		public override double GetDouble(int ordinal)
+		{
+			var d = GetDoubleOrNull(ordinal);
+			if (!d.HasValue) throw new NullReferenceException("DB2 returned null");
+			return d.Value;
+		}
+
+		private double? GetDoubleOrNull(int ordinal)
+		{
+			try
+			{
+				var obj = _rs.getObject(ordinal + 1);
+				var value = obj as java.lang.Double;
+				if (value != null) return value.doubleValue();
+
+				return null;
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
+		}
+
+		
+
+		public XmlDocument GetXmlDocument(int ordinal)
+		{
+			object obj;
+			try
+			{
+				obj = _rs.getObject(ordinal + 1);
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
+			
+			var sqlxml = obj as java.sql.SQLXML;
+			if (sqlxml == null) return null;
+			var xml = new XmlDocument();
+			xml.LoadXml(sqlxml.getString());
+			var xmlDeclaration = xml.CreateXmlDeclaration("1.0", "UTF-16", null);
+			XmlElement root = xml.DocumentElement;
+			xml.InsertBefore(xmlDeclaration, root);
+			return xml;
+		}
+
+		private byte[] GetBlob(int ordinal)
+		{
+			object obj;
+			try
+			{
+				obj = _rs.getObject(ordinal + 1);
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
+			var blob = obj as java.sql.Blob;
+			if (blob == null) return null;
+			return blob.getBytes(1, (int)blob.length());
+		}
+
 		class RowDescription
 		{
 			public int FieldCount { get; set; }
-			public bool?[] ColumnNullables { get; set; }
 			public string[] ColumnNames { get; set; }
+			public ColumnDb2TypeEnum[] ColumnDb2Types { get; set; }
 			public Type[] ColumnTypes { get; set; }
 
 			public RowDescription(int columnCount)
 			{
 				FieldCount = columnCount;
-				ColumnNullables = new bool?[columnCount];
 				ColumnNames = new string[columnCount];
+				ColumnDb2Types = new ColumnDb2TypeEnum[columnCount];
 				ColumnTypes = new Type[columnCount];
 			}
 		}
@@ -185,38 +424,85 @@ namespace Wintegra.Data.jdbc
 				{
 					var ordinal = column + 1;
 
-					rowDescription.ColumnNullables[column] = IsNullable(meta, ordinal);
 					rowDescription.ColumnNames[column] = meta.getColumnName(ordinal);
-					rowDescription.ColumnTypes[column] = GetTypeFromDb(meta, ordinal);
+
+
+					ColumnDb2TypeEnum columnDb2Type;
+					Type columnType;
+					var columnTypeName = meta.getColumnTypeName(ordinal);
+					switch (columnTypeName)
+					{
+						case "CHARACTER":
+						case "VARCHAR":
+						case "CLOB":
+						case "GRAPHIC":
+						case "VARGRAPHIC":
+						case "DBCLOB":
+							columnDb2Type = ColumnDb2TypeEnum.Clob;
+							columnType = typeof(string);
+							break;
+						case "BLOB":
+							columnDb2Type = ColumnDb2TypeEnum.Blob;
+							columnType = typeof (byte[]);
+							break;
+						case "SMALLINT":
+							columnDb2Type = ColumnDb2TypeEnum.Int16;
+							columnType = typeof (short);
+							break;
+						case "INTEGER":
+							columnDb2Type = ColumnDb2TypeEnum.Int32;
+							columnType = typeof (int);
+							break;
+						case "BIGINT":
+							columnDb2Type = ColumnDb2TypeEnum.Int64;
+							columnType = typeof (long);
+							break;
+						case "DECFLOAT":
+						case "DECIMAL":
+							columnDb2Type = ColumnDb2TypeEnum.Decimal;
+							columnType = typeof(decimal);
+							break;
+						case "REAL":
+							columnDb2Type = ColumnDb2TypeEnum.Float;
+							columnType = typeof(float);
+							break;
+						case "DOUBLE":
+							columnDb2Type = ColumnDb2TypeEnum.Double;
+							columnType = typeof(double);
+							break;
+
+						case "DATE":
+							columnDb2Type = ColumnDb2TypeEnum.Date;
+							columnType = typeof(DateTime);
+							break;
+						case "TIME":
+							columnDb2Type = ColumnDb2TypeEnum.Time;
+							columnType = typeof(TimeSpan);
+							break;
+						case "TIMESTAMP":
+							columnDb2Type = ColumnDb2TypeEnum.Timestamp;
+							columnType = typeof(DateTime);
+							break;
+
+
+						case "XML":
+							columnDb2Type = ColumnDb2TypeEnum.Xml;
+							columnType = typeof(XmlDocument);
+							break;
+
+						default:
+							columnDb2Type = ColumnDb2TypeEnum.Default;
+							columnType = typeof (object);
+							break;
+					}
+
+
+
+					rowDescription.ColumnDb2Types[column] = columnDb2Type;
+					rowDescription.ColumnTypes[column] = columnType;
 				}
 
 				_rowDescription = rowDescription;
-			}
-		}
-
-		private bool? IsNullable(ResultSetMetaData meta, int ordinal)
-		{
-			int isNullable = meta.isNullable(ordinal);
-			switch (isNullable)
-			{
-				case 0: // ResultSetMetaData.columnNoNulls
-					return false;
-				case 1: // ResultSetMetaData.columnNullable
-					return true;
-				case 2: // ResultSetMetaData.columnNullableUnknown
-				default:
-					return null;
-			}
-		}
-
-		private Type GetTypeFromDb(ResultSetMetaData meta, int ordinal)
-		{
-			var columnType = meta.getColumnTypeName(ordinal);
-			switch (columnType)
-			{
-				case "CLOB":
-				default:
-					return typeof(String);
 			}
 		}
 
@@ -225,39 +511,78 @@ namespace Wintegra.Data.jdbc
 			try
 			{
 				EnsureTypes();
-				var obj = _rs.getObject(ordinal + 1);
-				return DbConvert(obj);
+				switch (_rowDescription.ColumnDb2Types[ordinal])
+				{
+					case ColumnDb2TypeEnum.Blob:
+						return GetBlob(ordinal);
+					case ColumnDb2TypeEnum.Clob:
+						return GetString(ordinal);
+					case ColumnDb2TypeEnum.Xml:
+						return GetXmlDocument(ordinal);
+					case ColumnDb2TypeEnum.Int16:
+						{
+							var d = GetShort(ordinal);
+							if (d.HasValue) return d.Value;
+						}
+						return DBNull.Value;
+					case ColumnDb2TypeEnum.Int32:
+						{
+							var d = GetInteger(ordinal);
+							if (d.HasValue) return d.Value;
+						}
+						return DBNull.Value;
+					case ColumnDb2TypeEnum.Int64:
+						{
+							var d = GetLong(ordinal);
+							if (d.HasValue) return d.Value;
+						}
+						return DBNull.Value;
+					case ColumnDb2TypeEnum.Decimal:
+						{
+							var d = GetBigDecimal(ordinal);
+							if (d.HasValue) return (decimal)d.Value;
+						}
+						return DBNull.Value;
+					case ColumnDb2TypeEnum.Float:
+						{
+							var d = GetReal(ordinal);
+							if (d.HasValue) return d.Value;
+						}
+						return DBNull.Value;
+					case ColumnDb2TypeEnum.Double:
+						{
+							var d = GetDoubleOrNull(ordinal);
+							if (d.HasValue) return d.Value;
+						}
+						return DBNull.Value;
+					case ColumnDb2TypeEnum.Time:
+						{
+							var d = GetTime(ordinal);
+							if (d.HasValue) return d.Value;
+						}
+						return DBNull.Value;
+					case ColumnDb2TypeEnum.Date:
+						{
+							var d = GetDateTimeOrNull(ordinal);
+							if (d.HasValue) return d.Value;
+						}
+						return DBNull.Value;
+					case ColumnDb2TypeEnum.Timestamp:
+						{
+							var d = GetDateTimeOrNull(ordinal);
+							if (d.HasValue) return d.Value;
+						}
+						return DBNull.Value;
+					case ColumnDb2TypeEnum.Default:
+					default:
+						var value = _rs.getObject(ordinal + 1);
+						return value ?? DBNull.Value;
+				}
 			}
 			catch (SQLException se)
 			{
 				throw new Db2Exception(se);
 			}
-		}
-
-		private object DbConvert(object obj)
-		{
-			var clob = obj as java.sql.Clob;
-			if (clob != null)
-			{
-				return clob.getSubString(1, (int)clob.length());
-			}
-			var blob = obj as java.sql.Blob;
-			if (blob != null)
-			{
-				return blob.getBytes(1, (int)blob.length());
-			}
-			var sqlxml = obj as java.sql.SQLXML;
-			if (sqlxml != null)
-			{
-				var xml = new XmlDocument();
-				xml.LoadXml(sqlxml.getString());
-				var xmlDeclaration = xml.CreateXmlDeclaration("1.0", "UTF-16", null);
-				XmlElement root = xml.DocumentElement;
-				xml.InsertBefore(xmlDeclaration, root);
-				return xml;
-			}
-
-			return obj;
 		}
 
 		public override int GetValues(object[] values)
@@ -268,7 +593,14 @@ namespace Wintegra.Data.jdbc
 		public override bool IsDBNull(int ordinal)
 		{
 			EnsureTypes();
-			return _rowDescription.ColumnNullables[ordinal] ?? true;
+			try
+			{
+				return _rs.getObject(ordinal + 1) == null;
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
 		}
 
 		public override int FieldCount
@@ -294,21 +626,6 @@ namespace Wintegra.Data.jdbc
 		public override bool HasRows
 		{
 			get { throw new NotImplementedException(); }
-		}
-
-		public override decimal GetDecimal(int ordinal)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override double GetDouble(int ordinal)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override float GetFloat(int ordinal)
-		{
-			throw new NotImplementedException();
 		}
 
 		public void Dispose()

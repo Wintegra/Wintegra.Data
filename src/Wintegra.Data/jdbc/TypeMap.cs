@@ -22,6 +22,13 @@ namespace Wintegra.Data.jdbc
 				case DbType.Binary:
 					return Db2DataType.Binary;
 
+				case DbType.Int16:
+					return Db2DataType.Int16;
+				case DbType.Int32:
+					return Db2DataType.Int32;
+				case DbType.Int64:
+					return Db2DataType.Int64;
+
 
 				case DbType.AnsiString:
 				case DbType.String:

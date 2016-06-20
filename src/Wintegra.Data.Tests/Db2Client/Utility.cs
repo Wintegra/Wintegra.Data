@@ -11,6 +11,9 @@ namespace Wintegra.Data.Tests.Db2Client
 {
 	internal static class Utility
 	{
+		internal const int FieldCharacterSize = 254;
+		internal const int FieldGraphicSize = 127;
+		
 		public static char RandomAsciiChar()
 		{
 			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -18,6 +21,18 @@ namespace Wintegra.Data.Tests.Db2Client
 			return chars[random.Next(chars.Length)];
 		}
 
+		public static string RandomAsciiString(int length)
+		{
+			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			var random = new Random((int)DateTime.UtcNow.Ticks);
+			var sb = new StringBuilder(length);
+			for (int i = 0; i < length; i++)
+			{
+				sb.Append(chars[random.Next(chars.Length)]);
+			}
+			return sb.ToString();
+		}
+		
 		public static string RandomString(int length)
 		{
 			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
