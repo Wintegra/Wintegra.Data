@@ -1722,8 +1722,11 @@ namespace Wintegra.Data.Tests.Db2Client
 				Assert.That(db, Is.Not.Null);
 
 				db.Open();
-				using (var tn = db.BeginTransaction())
+				using (var jtn = db.BeginTransaction())
 				{
+					var tn = jtn as Wintegra.Data.jdbc.Db2Transaction;
+					Assert.That(tn, Is.Not.Null);
+
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;

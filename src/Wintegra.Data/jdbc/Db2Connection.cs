@@ -12,14 +12,20 @@ namespace Wintegra.Data.jdbc
 {
 	public sealed class Db2Connection : DbConnection, ICloneable
 	{
-		static Db2Connection()
-		{
-			Class.forName(typeof(com.ibm.db2.jcc.DB2Driver).AssemblyQualifiedName, true, Thread.currentThread().getContextClassLoader());
-		}
+		#region Fields
 
 		private bool _disposed = false;
 		private string _connectionString;
 		private Connection _connector;
+
+		#endregion
+
+		#region Constructors / Init / Open
+
+		static Db2Connection()
+		{
+			Class.forName(typeof(com.ibm.db2.jcc.DB2Driver).AssemblyQualifiedName, true, Thread.currentThread().getContextClassLoader());
+		}
 
 		public Db2Connection()
 		{
@@ -31,7 +37,55 @@ namespace Wintegra.Data.jdbc
 			ConnectionString = connectionString;
 		}
 
-		#region Db2Connector
+		public override void Open()
+		{
+			_connector = DriverManager.getConnection(_connectionString);
+			OnStateChange(new StateChangeEventArgs(ConnectionState.Closed, ConnectionState.Open));
+		}
+
+
+		#endregion
+
+		#region Connection string management
+
+		public override string ConnectionString
+		{
+			get { return _connectionString; }
+			set { _connectionString = value; }
+		}
+		
+		#endregion
+
+		#region Configuration settings
+
+		public override int ConnectionTimeout
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public override string Database
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public override string DataSource
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		#endregion
+
+		#region State management
+
+		[Browsable(false)]
+		public override ConnectionState State
+		{
+			get
+			{
+				if (_connector == null || _disposed) return ConnectionState.Closed;
+				return _connector.isClosed() ? ConnectionState.Closed : ConnectionState.Open;
+			}
+		}
 
 		internal TransactionStatus TransactionStatus { get; set; }
 
@@ -46,14 +100,49 @@ namespace Wintegra.Data.jdbc
 
 		#endregion
 
+		#region Commands
+
+		protected override DbCommand CreateDbCommand()
+		{
+			return CreateCommand();
+		}
+
+		public new Db2Command CreateCommand()
+		{
+			return new Db2Command(this);
+		}
+
+		#endregion
+
+		#region Transactions
+
+		protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
+		{
+			return new Db2Transaction(this, isolationLevel);
+		}
+
+		#endregion
+
+		#region Close
+
+		public override void Close()
+		{
+			if (_connector == null) return;
+			try
+			{
+				_connector.close();
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
+			_connector = null;
+			OnStateChange(new StateChangeEventArgs(ConnectionState.Open, ConnectionState.Closed));
+		}
+
 		~Db2Connection()
 		{
 			Dispose(false);
-		}
-
-		public object Clone()
-		{
-			throw new NotImplementedException();
 		}
 
 		public void Dispose()
@@ -78,24 +167,22 @@ namespace Wintegra.Data.jdbc
 			_disposed = true;
 		}
 
-		protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
+		#endregion
+
+		#region Backend version and capabilities
+
+		public override string ServerVersion
 		{
-			return new Db2Transaction(this, isolationLevel);
+			get { throw new NotImplementedException(); }
 		}
 
-		public override void Close()
+		#endregion
+
+		#region Misc
+
+		public object Clone()
 		{
-			if (_connector == null) return;
-			try
-			{
-				_connector.close();
-			}
-			catch (SQLException se)
-			{
-				throw new Db2Exception(se);
-			}
-			_connector = null;
-			OnStateChange(new StateChangeEventArgs(ConnectionState.Open, ConnectionState.Closed));
+			throw new NotImplementedException();
 		}
 
 		public override void ChangeDatabase(string databaseName)
@@ -103,46 +190,6 @@ namespace Wintegra.Data.jdbc
 			throw new NotImplementedException();
 		}
 
-		public override void Open()
-		{
-			_connector = DriverManager.getConnection(_connectionString);
-			OnStateChange(new StateChangeEventArgs(ConnectionState.Closed, ConnectionState.Open));
-		}
-
-		public override string ConnectionString
-		{
-			get { return _connectionString; }
-			set { _connectionString = value; }
-		}
-
-		public override string Database
-		{
-			get { throw new NotImplementedException(); }
-		}
-
-		[Browsable(false)]
-		public override ConnectionState State
-		{
-			get
-			{
-				if (_connector == null || _disposed) return ConnectionState.Closed;
-				return _connector.isClosed() ? ConnectionState.Closed : ConnectionState.Open;
-			}
-		}
-
-		public override string DataSource
-		{
-			get { throw new NotImplementedException(); }
-		}
-
-		public override string ServerVersion
-		{
-			get { throw new NotImplementedException(); }
-		}
-
-		protected override DbCommand CreateDbCommand()
-		{
-			return new Db2Command(this);
-		}
+		#endregion
 	}
 }

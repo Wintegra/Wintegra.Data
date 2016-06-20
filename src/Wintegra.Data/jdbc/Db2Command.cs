@@ -12,6 +12,8 @@ namespace Wintegra.Data.jdbc
 {
 	public sealed class Db2Command : DbCommand, ICloneable
 	{
+		#region Fields
+
 		private bool _disposed = false;
 
 		private string _commandText;
@@ -20,6 +22,10 @@ namespace Wintegra.Data.jdbc
 		private Db2Transaction _transaction;
 		private readonly Db2ParameterCollection _parameters;
 
+		#endregion
+
+		#region Constructors
+		
 		public Db2Command() : base()
 		{
 			_parameters = new Db2ParameterCollection();
@@ -30,37 +36,13 @@ namespace Wintegra.Data.jdbc
 			Connection = connection;
 		}
 
-		~Db2Command()
-		{
-			Dispose(false);
-		}
+		#endregion
 
-		public object Clone()
-		{
-			throw new NotImplementedException();
-		}
+		#region Public properties
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+		internal static readonly Regex XmlExp = new Regex(@"\(:(?<n>\w+)\d+,:\1\d+\)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-		private void Dispose(bool disposing)
-		{
-			if (_disposed) return;
-
-
-			_disposed = true;
-		}
-
-		public override void Prepare()
-		{
-			throw new NotImplementedException();
-		}
-
-		public static readonly Regex XmlExp = new Regex(@"\(:(?<n>\w+)\d+,:\1\d+\)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
+		[Category("Data"), DefaultValue("")]
 		public override string CommandText
 		{
 			get { return _commandText; }
@@ -80,12 +62,6 @@ namespace Wintegra.Data.jdbc
 		}
 
 		public override CommandType CommandType
-		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
-		}
-
-		public override UpdateRowSource UpdatedRowSource
 		{
 			get { throw new NotImplementedException(); }
 			set { throw new NotImplementedException(); }
@@ -119,30 +95,51 @@ namespace Wintegra.Data.jdbc
 			set { throw new NotImplementedException(); }
 		}
 
-		public override void Cancel()
+		public override UpdateRowSource UpdatedRowSource
 		{
-			throw new NotImplementedException();
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
 		}
 
-		protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
+		#endregion
+
+		#region Parameters
+
+		protected override DbParameter CreateDbParameter()
 		{
-			try
+			return CreateParameter();
+		}
+
+		public new Db2Parameter CreateParameter()
+		{
+			return new Db2Parameter();
+		}
+
+		protected override DbParameterCollection DbParameterCollection { get { return Parameters; } }
+
+		[Category("Data"), DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+		public new Db2ParameterCollection Parameters
+		{
+			get
 			{
-				var stmt = PrepareExecute();
-				var resultSet = stmt.executeQuery();
-				return new Db2DataReader(stmt, resultSet);
+				return _parameters;
 			}
-			catch (SQLException se)
-			{
-				throw new Db2Exception(se);
-			}
+		}
+
+		#endregion
+
+		#region Prepare
+
+		public override void Prepare()
+		{
+			throw new NotImplementedException();
 		}
 
 		private CallableStatement PrepareExecute()
 		{
 			var connector = _connection.CheckReadyAndGetConnector();
 			var stmt = connector.prepareCall(_commandText);
-			
+
 			foreach (Db2Parameter p in Parameters)
 			{
 				//switch (p.Db2DataType)
@@ -156,7 +153,7 @@ namespace Wintegra.Data.jdbc
 				}
 				else if (obj is XmlDocument)
 				{
-					var xml = ((XmlDocument) obj);
+					var xml = ((XmlDocument)obj);
 					var encoding = System.Text.Encoding.UTF8;
 					if (xml.HasChildNodes)
 					{
@@ -234,6 +231,10 @@ namespace Wintegra.Data.jdbc
 			return stmt;
 		}
 
+		#endregion
+
+		#region Execute Non Query
+
 		public override int ExecuteNonQuery()
 		{
 			try
@@ -247,40 +248,46 @@ namespace Wintegra.Data.jdbc
 			}
 		}
 
+		#endregion
+
+		#region Execute Scalar
+
 		public override object ExecuteScalar()
 		{
-			throw new NotImplementedException();
-		}
-
-
-		#region Parameters
-
-		protected override DbParameter CreateDbParameter()
-		{
-			return CreateParameter();
-		}
-
-		public new Db2Parameter CreateParameter()
-		{
-			return new Db2Parameter();
-		}
-
-		protected override DbParameterCollection DbParameterCollection { get { return Parameters; } }
-
-		[Category("Data"), DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-		public new Db2ParameterCollection Parameters
-		{
-			get
+			try
 			{
-				return _parameters;
+				var stmt = PrepareExecute();
+				var resultSet = stmt.executeQuery();
+				using (var reader = new Db2DataReader(stmt, resultSet))
+				{
+					return reader.GetValue(0);
+				}
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
 			}
 		}
 
 		#endregion
 
+		#region Execute Reader
 
+		protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
+		{
+			try
+			{
+				var stmt = PrepareExecute();
+				var resultSet = stmt.executeQuery();
+				return new Db2DataReader(stmt, resultSet);
+			}
+			catch (SQLException se)
+			{
+				throw new Db2Exception(se);
+			}
+		}
 
-
+		#endregion
 
 		#region Transactions
 
@@ -304,7 +311,51 @@ namespace Wintegra.Data.jdbc
 			set { _transaction = value; }
 		}
 
+		#endregion
 
+		#region Cancel
+
+		public override void Cancel()
+		{
+			throw new NotImplementedException();
+		}
+
+		#endregion
+
+		#region Dispose
+
+		~Db2Command()
+		{
+			Dispose(false);
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		private void Dispose(bool disposing)
+		{
+			if (_disposed) return;
+
+
+			_disposed = true;
+		}
+
+		#endregion
+
+		#region Misc
+
+		object ICloneable.Clone()
+		{
+			return Clone();
+		}
+
+		public Db2Command Clone()
+		{
+			throw new NotImplementedException();
+		}
 
 		#endregion
 	}
