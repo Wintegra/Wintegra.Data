@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using CallableStatement = java.sql.CallableStatement;
@@ -138,7 +139,41 @@ namespace Wintegra.Data.jdbc
 		private CallableStatement PrepareExecute()
 		{
 			var connector = _connection.CheckReadyAndGetConnector();
-			var stmt = connector.prepareCall(_commandText);
+			var commandText = _commandText;
+			if (commandText.Contains("?"))
+			{
+				var sb = new StringBuilder();
+				int i = 0, len = Parameters.Count;
+				foreach (var ch in commandText)
+				{
+					if ('?' == ch)
+					{
+					again_search_param:
+						var p = Parameters[i % len];
+						var obj = p.Value;
+						var name = p.CleanName;
+						i++;
+
+					again_inject_param:
+						if (obj is XmlDeclaration)
+						{
+							goto again_search_param; // skip for Dapper
+						}
+						else if (obj is XmlElement)
+						{
+							obj = ((XmlElement)obj).OwnerDocument; // compatible with Dapper
+							name = name.Substring(0, name.Length - 1);
+							goto again_inject_param;
+						}
+
+						sb.Append(":" + name);
+						continue;
+					}
+					sb.Append(ch);
+				}
+				commandText = sb.ToString();
+			}
+			var stmt = connector.prepareCall(commandText);
 
 			foreach (Db2Parameter p in Parameters)
 			{
@@ -146,10 +181,14 @@ namespace Wintegra.Data.jdbc
 				var obj = p.Value;
 				var name = p.CleanName;
 
-			again:
-				if (obj is byte[])
+			again_add_param:
+				if (obj is DBNull)
 				{
-					stmt.setBytes(name, (byte[])obj);
+					stmt.setNull(name, java.sql.Types.NVARCHAR);
+				}
+				else if (obj is string)
+				{
+					stmt.setString(name, (string)obj);
 				}
 				else if (obj is XmlDocument)
 				{
@@ -181,15 +220,7 @@ namespace Wintegra.Data.jdbc
 				{
 					obj = ((XmlElement)obj).OwnerDocument; // compatible with Dapper
 					name = name.Substring(0, name.Length - 1);
-					goto again;
-				}
-				else if (obj is char)
-				{
-					stmt.setString(name, obj.ToString());
-				}
-				else if (obj is string)
-				{
-					stmt.setString(name, (string)obj);
+					goto again_add_param;
 				}
 				else if (obj is short)
 				{
@@ -222,6 +253,14 @@ namespace Wintegra.Data.jdbc
 				else if (obj is DateTime)
 				{
 					stmt.setTimestamp(name, Db2Util.toTimestamp((DateTime)obj));
+				}
+				else if (obj is byte[])
+				{
+					stmt.setBytes(name, (byte[])obj);
+				}
+				else if (obj is char)
+				{
+					stmt.setString(name, obj.ToString());
 				}
 				else
 				{

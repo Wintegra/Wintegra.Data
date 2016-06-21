@@ -29,6 +29,20 @@ namespace Wintegra.Data.jdbc
 				case DbType.Int64:
 					return Db2DataType.Int64;
 
+				case DbType.Single:
+					return Db2DataType.Single;
+				case DbType.Decimal:
+					return Db2DataType.Decimal;
+				case DbType.Double:
+					return Db2DataType.Double;
+
+				case DbType.Date:
+					return Db2DataType.Date;
+				case DbType.Time:
+					return Db2DataType.Time;
+				case DbType.DateTime:
+					return Db2DataType.DateTime;
+
 
 				case DbType.AnsiString:
 				case DbType.String:

@@ -41,6 +41,8 @@ namespace Wintegra.Data.Tests.Db2Client
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
 					Assert.That(actual.FIELD.Length, Is.EqualTo(Utility.FieldCharacterSize));
 					Assert.That(actual.FIELD, Does.StartWith(character));
 					Assert.That(actual.FIELD, Is.EqualTo(character + new String(' ', Utility.FieldCharacterSize - character.Length)));
@@ -94,6 +96,8 @@ namespace Wintegra.Data.Tests.Db2Client
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
 					Assert.That(actual.FIELD, Is.EqualTo(varchar));
 					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
 				}
@@ -145,6 +149,8 @@ namespace Wintegra.Data.Tests.Db2Client
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
 					Assert.That(actual.FIELD, Is.EqualTo(clob));
 					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
 				}
@@ -196,6 +202,8 @@ namespace Wintegra.Data.Tests.Db2Client
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
 					Assert.That(actual.FIELD.Length, Is.EqualTo(Utility.FieldGraphicSize));
 					Assert.That(actual.FIELD, Does.StartWith(graphic));
 					Assert.That(actual.FIELD, Is.EqualTo(graphic + new String(' ', Utility.FieldGraphicSize - graphic.Length)));
@@ -249,6 +257,8 @@ namespace Wintegra.Data.Tests.Db2Client
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
 					Assert.That(actual.FIELD, Is.EqualTo(vargraphic));
 					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
 				}
@@ -300,6 +310,8 @@ namespace Wintegra.Data.Tests.Db2Client
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
 					Assert.That(actual.FIELD, Is.EqualTo(dbclob));
 					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
 				}
@@ -351,6 +363,8 @@ namespace Wintegra.Data.Tests.Db2Client
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
 					Assert.That(actual.FIELD, Is.EqualTo(blob));
 					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
 				}
@@ -406,6 +420,8 @@ namespace Wintegra.Data.Tests.Db2Client
 					Assert.That(list.Count, Is.EqualTo(1));
 
 					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
 					Assert.That(actual.FIELD, Is.EqualTo(value));
 					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
 				}
@@ -437,20 +453,507 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		#endregion
 
-		// INTEGER 
-		// BIGINT
-		// DECIMAL 
-		// DECFLOAT
-		// REAL
-		// DOUBLE
+		#region INTEGER
+
+		[Test]
+		public void TestWriteAndReadInteger(
+			[Values("odbc", "jdbc")] string type,
+			[Values(int.MinValue, short.MinValue, -1, 0, 1, 7, short.MaxValue, int.MaxValue)] int value)
+		{
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_INTEGER(FIELD) VALUES(:INT32)", new { INT32 = value }, tn);
+					var list = db.QueryObjects<DBG_TABLE<int?>>("SELECT FIELD FROM DBG_TABLE_INTEGER", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.EqualTo(value));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullInteger([Values("odbc", "jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_INTEGER(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<int?>>("SELECT FIELD, EMPTY FROM DBG_TABLE_INTEGER", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
+
+		#region BIGINT
+
+		[Test]
+		public void TestWriteAndReadBigint(
+			[Values("odbc", "jdbc")] string type,
+			[Values(long.MinValue, int.MinValue, short.MinValue, -1, 0, 1, 7, short.MaxValue, int.MaxValue, long.MaxValue)] long value)
+		{
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_BIGINT(FIELD) VALUES(:INT64)", new { INT64 = value }, tn);
+					var list = db.QueryObjects<DBG_TABLE<long?>>("SELECT FIELD FROM DBG_TABLE_BIGINT", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.EqualTo(value));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullBigint([Values("odbc", "jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_BIGINT(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<long?>>("SELECT FIELD, EMPTY FROM DBG_TABLE_BIGINT", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
+
+		#region DECIMAL
+
+		private static decimal GetDecimal(string valueString)
+		{
+			switch (valueString)
+			{
+				case "MinValue":
+					return -792281625142643375935.4395034m;
+				case "MinusOne":
+					return -1m;
+				case "Zero":
+					return 0m;
+				case "One":
+					return 1m;
+				case "MaxValue":
+					return 792281625142643375935.4395034m;
+				default:
+					return decimal.Parse(valueString);
+			}
+
+		}
+
+		[Test]
+		public void TestWriteAndReadDecimal(
+			[Values("odbc", "jdbc")] string type,
+			[Values("MinValue", "MinusOne", "Zero", "One", "MaxValue")] string valueString)
+		{
+			decimal value = GetDecimal(valueString);
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_DECIMAL(FIELD) VALUES(:DECIMAL)", new { DECIMAL = value }, tn);
+					var list = db.QueryObjects<DBG_TABLE<decimal?>>("SELECT FIELD FROM DBG_TABLE_DECIMAL", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
+					if ("odbc".Equals(type)) actual.FIELD /= 1e7m;
+					Assert.That(actual.FIELD, Is.EqualTo(value));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullDecimal([Values("odbc", "jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_DECIMAL(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<decimal?>>("SELECT FIELD, EMPTY FROM DBG_TABLE_DECIMAL", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
+
+		#region DECFLOAT
+
+		// ODBC not supported DECFLOAT
+
+		[Test]
+		public void TestWriteAndReadDecfloat(
+			[Values("jdbc")] string type,
+			[Values("MinValue", "MinusOne", "Zero", "One", "MaxValue")] string valueString)
+		{
+			decimal value = GetDecimal(valueString);
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_DECFLOAT(FIELD) VALUES(:DECFLOAT)", new { DECFLOAT = value }, tn);
+					var list = db.QueryObjects<DBG_TABLE<decimal?>>("SELECT FIELD FROM DBG_TABLE_DECFLOAT", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.EqualTo(value));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullDecfloat([Values("jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_DECFLOAT(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<decimal?>>("SELECT FIELD, EMPTY FROM DBG_TABLE_DECFLOAT", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
+
+		#region REAL
+
+		[Test]
+		public void TestWriteAndReadReal(
+			[Values("odbc", "jdbc")] string type,
+			[Values(float.MinValue, -1.1f, -0.0f, 0.0f, 1.1f, float.MaxValue)] float value)
+		{
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_REAL(FIELD) VALUES(:REAL)", new { REAL = value }, tn);
+					var list = db.QueryObjects<DBG_TABLE<float?>>("SELECT FIELD FROM DBG_TABLE_REAL", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.EqualTo(value));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullReal([Values("odbc", "jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_REAL(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<float?>>("SELECT FIELD, EMPTY FROM DBG_TABLE_REAL", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
+
+		#region DOUBLE
+
+		[Test]
+		public void TestWriteAndReadDouble(
+			[Values("odbc", "jdbc")] string type,
+			[Values(double.MinValue, -1.0, 0.0, 1.0, Double.MaxValue)] double value)
+		{
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_DOUBLE(FIELD) VALUES(:DOUBLE)", new { DOUBLE = value }, tn);
+					var list = db.QueryObjects<DBG_TABLE<double?>>("SELECT FIELD FROM DBG_TABLE_DOUBLE", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.EqualTo(value));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullDouble([Values("odbc", "jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_DOUBLE(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<double?>>("SELECT FIELD, EMPTY FROM DBG_TABLE_DOUBLE", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
 
 		#endregion
 
 		#region Date, time, and timestamp data types
 
-		// DATE
-		// TIME
-		// TIMESTAMP
+		#region DATE
+
+		[Test]
+		public void TestWriteAndReadDate(
+			[Values("odbc", "jdbc")] string type,
+			[Values("2016-06-20")] string valueString)
+		{
+			var value = DateTime.Parse(valueString);
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_DATE(FIELD) VALUES(:DATE)", new { DATE = value }, tn);
+					var list = db.QueryObjects<DBG_TABLE<DateTime?>>("SELECT FIELD FROM DBG_TABLE_DATE", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
+					if ("jdbc".Equals(type)) actual.FIELD = actual.FIELD.Value.ToLocalTime();
+					Assert.That(actual.FIELD, Is.EqualTo(value));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullDate([Values("odbc", "jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_DATE(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<DateTime?>>("SELECT FIELD, EMPTY FROM DBG_TABLE_DATE", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
+
+		#region TIME
+
+		[Test]
+		public void TestWriteAndReadTime(
+			[Values("odbc", "jdbc")] string type,
+			[Values("16:49:05")] string valueString)
+		{
+			var value = TimeSpan.Parse(valueString);
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_TIME(FIELD) VALUES(:TIME)", new { TIME = value }, tn);
+					var list = db.QueryObjects<DBG_TABLE<TimeSpan?>>("SELECT FIELD FROM DBG_TABLE_TIME", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.EqualTo(value));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullTime([Values("odbc", "jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_TIME(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<TimeSpan?>>("SELECT FIELD, EMPTY FROM DBG_TABLE_TIME", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
+
+		#region TIMESTAMP
+
+		[Test]
+		public void TestWriteAndReadTimestamp(
+			[Values("odbc", "jdbc")] string type,
+			[Values("2016-06-20 16:49:05.057")] string valueString)
+		{
+			var value = DateTime.Parse(valueString).ToUniversalTime();
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_TIMESTAMP(FIELD) VALUES(:TIMESTAMP)", new { TIMESTAMP = value }, tn);
+					var list = db.QueryObjects<DBG_TABLE<DateTime?>>("SELECT FIELD FROM DBG_TABLE_TIMESTAMP", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.FIELD, Is.Not.Null);
+					if ("jdbc".Equals(type)) actual.FIELD = actual.FIELD.Value.ToLocalTime();
+					Assert.That(actual.FIELD, Is.EqualTo(value));
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+				}
+			}
+		}
+
+		[Test]
+		public void TestReadNullTimestamp([Values("odbc", "jdbc")] string type)
+		{
+			char ch = Utility.RandomAsciiChar();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_TIMESTAMP(EMPTY) VALUES('" + ch + "')", new { }, tn);
+					var list = db.QueryObjects<DBG_TABLE<TimeSpan?>>("SELECT FIELD, EMPTY FROM DBG_TABLE_TIMESTAMP", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
 
 		#endregion
 

@@ -1252,7 +1252,7 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE_DOUBLE(EMPTY) VALUES('" + ch + "')";
+						command.CommandText = "INSERT INTO DBG_TABLE_DECFLOAT(EMPTY) VALUES('" + ch + "')";
 
 						command.ExecuteNonQuery();
 					}
@@ -1260,7 +1260,7 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "SELECT EMPTY, FIELD FROM DBG_TABLE_DOUBLE";
+						command.CommandText = "SELECT EMPTY, FIELD FROM DBG_TABLE_DECFLOAT";
 
 						using (var reader = command.ExecuteReader())
 						{
@@ -1711,7 +1711,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestWriteAndReadTimeAsTimespan(
+		public void TestWriteAndReadTimeAsTimespanp(
 			[Values("jdbc")] string type,
 			[Values("16:49:05")] string valueString)
 		{
@@ -1763,7 +1763,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullTimestamp([Values("odbc", "jdbc")] string type)
+		public void TestReadNullTime([Values("odbc", "jdbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -1775,7 +1775,7 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE_TIMESTAMP(EMPTY) VALUES('" + ch + "')";
+						command.CommandText = "INSERT INTO DBG_TABLE_TIME(EMPTY) VALUES('" + ch + "')";
 
 						command.ExecuteNonQuery();
 					}
@@ -1783,7 +1783,7 @@ namespace Wintegra.Data.Tests.Db2Client
 					using (var command = db.CreateCommand())
 					{
 						command.Transaction = tn;
-						command.CommandText = "SELECT EMPTY, FIELD FROM DBG_TABLE_TIMESTAMP";
+						command.CommandText = "SELECT EMPTY, FIELD FROM DBG_TABLE_TIME";
 
 						using (var reader = command.ExecuteReader())
 						{
@@ -1893,7 +1893,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullTime([Values("odbc", "jdbc")] string type)
+		public void TestReadNullTimestamp([Values("odbc", "jdbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 

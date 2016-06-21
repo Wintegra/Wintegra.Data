@@ -12,6 +12,10 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -168,6 +172,8 @@
     <Compile Include="jdbc\Db2Connection.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="jdbc\Db2ConnectionOptions.cs" />
+    <Compile Include="jdbc\Db2ConnectionStringBuilder.cs" />
     <Compile Include="jdbc\Db2Connector.cs" />
     <Compile Include="jdbc\Db2DataType.cs" />
     <Compile Include="jdbc\Db2Exception.cs" />

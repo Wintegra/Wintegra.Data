@@ -15,6 +15,7 @@ namespace Wintegra.Data.jdbc
 		#region Fields
 
 		private bool _disposed = false;
+		internal Db2ConnectionStringBuilder Settings { get; private set; }
 		private string _connectionString;
 		private Connection _connector;
 
@@ -51,7 +52,15 @@ namespace Wintegra.Data.jdbc
 		public override string ConnectionString
 		{
 			get { return _connectionString; }
-			set { _connectionString = value; }
+			set
+			{
+				if (value == null)
+				{
+					value = string.Empty;
+				}
+				Settings = new Db2ConnectionStringBuilder(value);
+				_connectionString = Settings.ConnectionString;
+			}
 		}
 		
 		#endregion
