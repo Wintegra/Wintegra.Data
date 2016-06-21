@@ -352,8 +352,6 @@ namespace Wintegra.Data.jdbc
 			}
 		}
 
-		
-
 		public XmlDocument GetXmlDocument(int ordinal)
 		{
 			object obj;
@@ -424,8 +422,7 @@ namespace Wintegra.Data.jdbc
 				{
 					var ordinal = column + 1;
 
-					rowDescription.ColumnNames[column] = meta.getColumnName(ordinal);
-
+					rowDescription.ColumnNames[column] = meta.getColumnLabel(ordinal);
 
 					ColumnDb2TypeEnum columnDb2Type;
 					Type columnType;

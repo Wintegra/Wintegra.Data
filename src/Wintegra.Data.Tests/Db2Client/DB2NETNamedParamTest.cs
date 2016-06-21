@@ -605,15 +605,15 @@ namespace Wintegra.Data.Tests.Db2Client
 						Assert.That(actual, Is.Not.Null);
 						Assert.That(actual.Income.ToLocalTime(), Is.EqualTo(income));
 						Assert.That(actual.PACK_ID, Is.EqualTo(packId));
-//						Assert.That(actual.No, Is.EqualTo(no));
-//						Assert.That(actual.FName, Is.EqualTo(fname));
-//						Assert.That(actual.LName, Is.EqualTo(lname));
-//						Assert.That(actual.MName, Is.EqualTo(mname));
-//						Assert.That(actual.BDate, Is.EqualTo(bdate));
-//						Assert.That(actual.SNILS, Is.EqualTo(snils));
-//						Assert.That(actual.Address, Is.EqualTo(address));
-//						Assert.That(actual.CloseDate, Is.EqualTo(closeDate));
-//						Assert.That(actual.CategoryCode, Is.EqualTo(categoryCode));
+						Assert.That(actual.No, Is.EqualTo(no));
+						Assert.That(actual.FName, Is.EqualTo(fname));
+						Assert.That(actual.LName, Is.EqualTo(lname));
+						Assert.That(actual.MName, Is.EqualTo(mname));
+						Assert.That(actual.BDate, Is.EqualTo(bdate));
+						Assert.That(actual.SNILS, Is.EqualTo(snils));
+						Assert.That(actual.Address, Is.EqualTo(address));
+						Assert.That(actual.CloseDate, Is.EqualTo(closeDate));
+						Assert.That(actual.CategoryCode, Is.EqualTo(categoryCode));
 					}
 					
 				}
