@@ -240,11 +240,11 @@ namespace Wintegra.Data.jdbc
 				var obj = _rs.getObject(ordinal + 1);
 				{
 					var value = obj as java.sql.Date;
-					if (value != null) return value.ToDateTime();
+					if (value != null) return Db2Util.ToDateTime(value);
 				}
 				{
 					var value = obj as java.sql.Timestamp;
-					if (value != null) return value.ToDateTime();
+					if (value != null) return Db2Util.ToDateTime(value);
 				}
 
 				return null;
@@ -261,7 +261,7 @@ namespace Wintegra.Data.jdbc
 			{
 				var obj = _rs.getObject(ordinal + 1);
 				var value = obj as java.sql.Time;
-				if (value != null) return value.ToTimeSpan();
+				if (value != null) return Db2Util.ToTimeSpan(value);
 
 				return null;
 			}
@@ -296,7 +296,7 @@ namespace Wintegra.Data.jdbc
 			{
 				var obj = _rs.getObject(ordinal + 1);
 				var value = obj as java.math.BigDecimal;
-				if (value != null) return value.ToDecimal();
+				if (value != null) return Db2Util.ToDecimal(value);
 
 				return null;
 			}

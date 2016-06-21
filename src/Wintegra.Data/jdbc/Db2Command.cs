@@ -205,7 +205,7 @@ namespace Wintegra.Data.jdbc
 				}
 				else if (obj is decimal)
 				{
-					stmt.setBigDecimal(name, ((decimal)obj).toBigDecimal());
+					stmt.setBigDecimal(name, Db2Util.toBigDecimal((decimal)obj));
 				}
 				else if (obj is float)
 				{
@@ -217,11 +217,11 @@ namespace Wintegra.Data.jdbc
 				}
 				else if (obj is TimeSpan)
 				{
-					stmt.setTime(name, ((TimeSpan)obj).toTime());
+					stmt.setTime(name, Db2Util.toTime((TimeSpan)obj));
 				}
 				else if (obj is DateTime)
 				{
-					stmt.setTimestamp(name, ((DateTime)obj).toTimestamp());
+					stmt.setTimestamp(name, Db2Util.toTimestamp((DateTime)obj));
 				}
 				else
 				{
