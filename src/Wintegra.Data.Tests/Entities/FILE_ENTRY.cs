@@ -22,5 +22,6 @@ namespace Wintegra.Data.Tests.Entities
 
 		public long? CloseDate { get; set; }
 		public long CategoryCode { get; set; }
+		public string CategoryName { get; set; }  
 	}
 }

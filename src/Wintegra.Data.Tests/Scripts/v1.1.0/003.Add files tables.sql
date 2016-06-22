@@ -39,3 +39,19 @@ GO
 ALTER TABLE FILE_ENTRY
 	ADD COLUMN SNILS VARGRAPHIC(30)
 GO
+
+CREATE TABLE "CATEGORY_LIST"  ( 
+	 "ID"         BIGINT NOT NULL,
+	 "SHORTNAME"  VARGRAPHIC(128) NOT NULL,
+	 "NAME"       DBCLOB(10485760) LOGGED NOT COMPACT,
+	 CONSTRAINT "PK_CATEGORY_LIST" PRIMARY KEY("ID")
+)
+GO
+
+INSERT INTO CATEGORY_LIST(ID, SHORTNAME, NAME) VALUES 
+	(1, 'По старости', 'Получатели пенсии по старости страховой пенсии и пенсии по государственному пенсионному обеспечению'),
+	(2, 'По инвалидности', 'Получатели пенсии по инвалидности страховой пенсии и пенсии по государственному пенсионному обеспечению'),
+	(3, 'По СПК', 'Получатели пенсии по случаю потери кормильца страховой пенсии и пенсии по государственному пенсионному обеспечению'),
+	(4, 'Дети инвалиды', 'Дети инвалиды и инвалиды с детства'),
+	(5, 'ЕВД', 'Выплатные дела получателей ЕДВ')
+GO

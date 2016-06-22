@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Data;
 using System.Data.Common;
+using System.Text.RegularExpressions;
 using System.Xml;
-using Statement = java.sql.Statement;
+using CallableStatement = java.sql.CallableStatement;
 using ResultSet = java.sql.ResultSet;
 using SQLException = java.sql.SQLException;
 
@@ -28,15 +29,77 @@ namespace Wintegra.Data.jdbc
 			Timestamp,
 		}
 
-
 		private bool _disposed = false;
-		private readonly Statement _statement;
+		private readonly Db2Connection _connection;
+		private readonly Db2Command _command;
+
+		private int _currentCommand;
+		private readonly string[] _batchCommands;
+		private readonly Db2ParameterCollection[] _batchParameters;
+
+		private CallableStatement _statement;
 		private ResultSet _rs;
 
-		internal Db2DataReader(Statement statement, ResultSet rs)
+		/// <exception cref="Db2Exception"></exception>
+		internal Db2DataReader(Db2Command command)
 		{
-			_statement = statement;
-			_rs = rs;
+			_connection = command.Connection;
+			_command = command;
+
+			_currentCommand = -1;
+			_batchCommands = PrepareBatchCommands(_command.CommandText);
+			_batchParameters = PrepareBatchParameters(_command.Parameters);
+			_statement = PrepareStatementAndResultSet();
+			_rs = _statement.executeQuery();
+		}
+
+		internal static readonly Regex QueryMultipleExp = new Regex(@"(?<q>[^;]+);?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static string[] PrepareBatchCommands(string commandText)
+		{
+			var queryMultiple = QueryMultipleExp.Matches(commandText);
+			var batchCommands = new string[queryMultiple.Count];
+
+			for (int i = 0; i < queryMultiple.Count; i++)
+			{
+				batchCommands[i] = queryMultiple[i].Groups["q"].Value;
+			}
+			return batchCommands;
+		}
+
+		internal static readonly Regex ParameterNameExp = new Regex(@"(?<n>:\w+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private Db2ParameterCollection[] PrepareBatchParameters(Db2ParameterCollection parameters)
+		{
+			if (_batchCommands.Length < 2) return new Db2ParameterCollection[] { parameters };
+
+			var batchParameters = new Db2ParameterCollection[_batchCommands.Length];
+			int parameter = 0;
+			for (int i = 0; i < _batchCommands.Length; i++)
+			{
+				var query = _batchCommands[i];
+				var commandText = Db2Command.PrepareCommandText(query, parameters, ref parameter);
+				_batchCommands[i] = commandText;
+				var names = ParameterNameExp.Matches(commandText);
+
+				var collection = new Db2ParameterCollection();
+				foreach (Match n in names)
+				{
+					var name = n.Groups["n"].Value;
+					var p = parameters[name].Clone();
+					collection.Add(p);
+				}
+
+				batchParameters[i] = collection;
+			}
+			return batchParameters;
+		}
+
+		private CallableStatement PrepareStatementAndResultSet()
+		{
+			_currentCommand++;
+			if (_currentCommand >= _batchCommands.Length) return null;
+			var query = _batchCommands[_currentCommand];
+			var parameters = _batchParameters[_currentCommand];
+			return Db2Command.PrepareExecute(_connection, query, parameters);
 		}
 
 		~Db2DataReader()
@@ -65,6 +128,15 @@ namespace Wintegra.Data.jdbc
 				if (b)
 				{
 					_rs = _statement.getResultSet();
+				}
+				else
+				{
+					_statement = PrepareStatementAndResultSet();
+					if (_statement != null)
+					{
+						_rs = _statement.executeQuery();
+						b = true;
+					}
 				}
 				return b;
 			}

@@ -136,63 +136,74 @@ namespace Wintegra.Data.jdbc
 			throw new NotImplementedException();
 		}
 
-		private CallableStatement PrepareExecute()
+		internal static CallableStatement PrepareExecute(Db2Connection connection, string query, Db2ParameterCollection parameters)
 		{
-			var connector = _connection.CheckReadyAndGetConnector();
-			var commandText = _commandText;
-			if (commandText.Contains("?"))
-			{
-				var sb = new StringBuilder();
-				int i = 0, len = Parameters.Count;
-				foreach (var ch in commandText)
-				{
-					if ('?' == ch)
-					{
-					again_search_param:
-						var p = Parameters[i % len];
-						var obj = p.Value;
-						var name = p.CleanName;
-						i++;
-
-					again_inject_param:
-						if (obj is XmlDeclaration)
-						{
-							goto again_search_param; // skip for Dapper
-						}
-						else if (obj is XmlElement)
-						{
-							obj = ((XmlElement)obj).OwnerDocument; // compatible with Dapper
-							name = name.Substring(0, name.Length - 1);
-							goto again_inject_param;
-						}
-
-						sb.Append(":" + name);
-						continue;
-					}
-					sb.Append(ch);
-				}
-				commandText = sb.ToString();
-			}
+			var connector = connection.CheckReadyAndGetConnector();
+			int parameter = 0;
+			var commandText = PrepareCommandText(query, parameters, ref parameter);
 			var stmt = connector.prepareCall(commandText);
+			PrepareParameters(stmt, parameters);
 
-			foreach (Db2Parameter p in Parameters)
+			return stmt;
+		}
+
+		internal static string PrepareCommandText(string query, Db2ParameterCollection parameters, ref int parameter)
+		{
+			if (!query.Contains("?")) return query;
+
+			var sb = new StringBuilder();
+			int len = parameters.Count;
+			foreach (var ch in query)
+			{
+				if ('?' != ch)
+				{
+					sb.Append(ch);
+					continue;
+				}
+
+			again_search_param:
+				var p = parameters[parameter % len];
+				var obj = p.Value;
+				var name = p.CleanName;
+				parameter++;
+
+			again_inject_param:
+				if (obj is XmlDeclaration)
+				{
+					goto again_search_param; // skip for Dapper
+				}
+				if (obj is XmlElement)
+				{
+					obj = ((XmlElement)obj).OwnerDocument; // compatible with Dapper
+					name = name.Substring(0, name.Length - 1);
+					goto again_inject_param;
+				}
+
+				sb.Append(":" + name);
+			}
+			return sb.ToString();
+		}
+
+		private static void PrepareParameters(CallableStatement stmt, Db2ParameterCollection parameters)
+		{
+			foreach (Db2Parameter p in parameters)
 			{
 				//switch (p.Db2DataType)
 				var obj = p.Value;
 				var name = p.CleanName;
 
-			again_add_param:
+				again_add_param:
 				if (obj is DBNull)
 				{
 					stmt.setNull(name, java.sql.Types.NVARCHAR);
 				}
 				else if (obj is string)
 				{
-					stmt.setString(name, (string)obj);
+					stmt.setString(name, (string) obj);
 				}
 				else if (obj is XmlDocument)
 				{
-					var xml = ((XmlDocument)obj);
+					var xml = ((XmlDocument) obj);
 					var encoding = System.Text.Encoding.UTF8;
 					if (xml.HasChildNodes)
 					{
@@ -214,49 +225,49 @@ namespace Wintegra.Data.jdbc
 				}
 				else if (obj is XmlDeclaration)
 				{
-					continue;  // skip for Dapper
+					continue; // skip for Dapper
 				}
 				else if (obj is XmlElement)
 				{
-					obj = ((XmlElement)obj).OwnerDocument; // compatible with Dapper
+					obj = ((XmlElement) obj).OwnerDocument; // compatible with Dapper
 					name = name.Substring(0, name.Length - 1);
 					goto again_add_param;
 				}
 				else if (obj is short)
 				{
-					stmt.setShort(name, (short)obj);
+					stmt.setShort(name, (short) obj);
 				}
 				else if (obj is int)
 				{
-					stmt.setInt(name, (int)obj);
+					stmt.setInt(name, (int) obj);
 				}
 				else if (obj is long)
 				{
-					stmt.setLong(name, (long)obj);
+					stmt.setLong(name, (long) obj);
 				}
 				else if (obj is decimal)
 				{
-					stmt.setBigDecimal(name, Db2Util.toBigDecimal((decimal)obj));
+					stmt.setBigDecimal(name, Db2Util.toBigDecimal((decimal) obj));
 				}
 				else if (obj is float)
 				{
-					stmt.setFloat(name, (float)obj);
+					stmt.setFloat(name, (float) obj);
 				}
 				else if (obj is double)
 				{
-					stmt.setDouble(name, (double)obj);
+					stmt.setDouble(name, (double) obj);
 				}
 				else if (obj is TimeSpan)
 				{
-					stmt.setTime(name, Db2Util.toTime((TimeSpan)obj));
+					stmt.setTime(name, Db2Util.toTime((TimeSpan) obj));
 				}
 				else if (obj is DateTime)
 				{
-					stmt.setTimestamp(name, Db2Util.toTimestamp((DateTime)obj));
+					stmt.setTimestamp(name, Db2Util.toTimestamp((DateTime) obj));
 				}
 				else if (obj is byte[])
 				{
-					stmt.setBytes(name, (byte[])obj);
+					stmt.setBytes(name, (byte[]) obj);
 				}
 				else if (obj is char)
 				{
@@ -267,9 +278,8 @@ namespace Wintegra.Data.jdbc
 					stmt.setObject(name, obj);
 				}
 			}
-			return stmt;
 		}
-
+		
 		#endregion
 
 		#region Execute Non Query
@@ -278,7 +288,7 @@ namespace Wintegra.Data.jdbc
 		{
 			try
 			{
-				var stmt = PrepareExecute();
+				var stmt = PrepareExecute(_connection, _commandText, Parameters);
 				return stmt.executeUpdate();
 			}
 			catch (SQLException se)
@@ -295,9 +305,7 @@ namespace Wintegra.Data.jdbc
 		{
 			try
 			{
-				var stmt = PrepareExecute();
-				var resultSet = stmt.executeQuery();
-				using (var reader = new Db2DataReader(stmt, resultSet))
+				using (var reader = new Db2DataReader(this))
 				{
 					return reader.GetValue(0);
 				}
@@ -316,9 +324,7 @@ namespace Wintegra.Data.jdbc
 		{
 			try
 			{
-				var stmt = PrepareExecute();
-				var resultSet = stmt.executeQuery();
-				return new Db2DataReader(stmt, resultSet);
+				return new Db2DataReader(this);
 			}
 			catch (SQLException se)
 			{

@@ -6,6 +6,7 @@ You can use the ODBC or JDBC driver.
 ## Features
 
 * Compatible with [Dapper](https://github.com/StackExchange/dapper-dot-net).
+* Compatible with multiple SQL statements in one query.
 * Can find {IBM DB2 ODBC DRIVER} into Windows Registry for ODBC implementation.
 * Can read and write BLOB, DBCLOB, CLOB and XML fields.
 * Replace named parameters to the question mark (?) placeholder for passing parameters to a SQL Statement or a stored procedure (use with caution).

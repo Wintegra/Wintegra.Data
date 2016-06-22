@@ -170,7 +170,10 @@
     <Compile Include="Db2Client\Db2MuiltiQueryTest.cs" />
     <Compile Include="Db2Client\DB2NETNamedParamTest.cs" />
     <Compile Include="Db2Client\Utility.cs" />
+    <Compile Include="Entities\CATEGORY_ENTRY.cs" />
+    <Compile Include="Entities\ENTRY_LIST.cs" />
     <Compile Include="Entities\FILE_ENTRY.cs" />
+    <Compile Include="Entities\PACK_ENTRY.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

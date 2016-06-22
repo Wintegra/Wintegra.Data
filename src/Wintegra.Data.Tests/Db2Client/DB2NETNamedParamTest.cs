@@ -614,6 +614,7 @@ namespace Wintegra.Data.Tests.Db2Client
 						Assert.That(actual.Address, Is.EqualTo(address));
 						Assert.That(actual.CloseDate, Is.EqualTo(closeDate));
 						Assert.That(actual.CategoryCode, Is.EqualTo(categoryCode));
+						Assert.That(actual.CategoryName, Is.Null);
 					}
 					
 				}
