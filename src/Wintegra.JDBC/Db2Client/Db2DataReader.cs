@@ -8,7 +8,7 @@ using CallableStatement = java.sql.CallableStatement;
 using ResultSet = java.sql.ResultSet;
 using SQLException = java.sql.SQLException;
 
-namespace Wintegra.Data.jdbc
+namespace Wintegra.JDBC.Db2Client
 {
 	internal sealed class Db2DataReader : DbDataReader
 	{

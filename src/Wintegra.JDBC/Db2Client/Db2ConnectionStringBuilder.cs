@@ -5,7 +5,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace Wintegra.Data.jdbc
+namespace Wintegra.JDBC.Db2Client
 {
 	public sealed class Db2ConnectionStringBuilder : DbConnectionStringBuilder, IDictionary<string, object>
 	{

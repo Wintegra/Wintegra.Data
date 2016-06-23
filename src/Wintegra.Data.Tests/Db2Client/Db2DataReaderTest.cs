@@ -1718,13 +1718,13 @@ namespace Wintegra.Data.Tests.Db2Client
 			var value = TimeSpan.Parse(valueString);
 			using (var jdbc = Db2Driver.GetDbConnection(type))
 			{
-				var db = jdbc as Wintegra.Data.jdbc.Db2Connection;
+				var db = jdbc as Wintegra.JDBC.Db2Client.Db2Connection;
 				Assert.That(db, Is.Not.Null);
 
 				db.Open();
 				using (var jtn = db.BeginTransaction())
 				{
-					var tn = jtn as Wintegra.Data.jdbc.Db2Transaction;
+					var tn = jtn as Wintegra.JDBC.Db2Client.Db2Transaction;
 					Assert.That(tn, Is.Not.Null);
 
 					using (var command = db.CreateCommand())
@@ -1748,7 +1748,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 						using (var jreader = command.ExecuteReader())
 						{
-							var reader = jreader as Wintegra.Data.jdbc.Db2DataReader;
+							var reader = jreader as Wintegra.JDBC.Db2Client.Db2DataReader;
 							Assert.That(reader, Is.Not.Null);
 
 							Assert.That(reader.Read(), Is.True);

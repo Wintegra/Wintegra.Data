@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("Retail")]
 #endif
 [assembly: AssemblyCompany("Wintegra®")]
-[assembly: AssemblyProduct("This package contain driver set for use with IBM DB2 database. You can use the ODBC or JDBC driver.")]
+[assembly: AssemblyProduct("This package contain driver set for use with IBM DB2 database.")]
 [assembly: AssemblyCopyright("Copyright © Wintegra® 2016. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

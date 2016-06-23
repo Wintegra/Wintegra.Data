@@ -1359,7 +1359,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		[Test, TestCaseSource("DapperSet")]
 		public void TestXmlExp(SqlQueryObject d)
 		{
-			string sql = Wintegra.Data.jdbc.Db2Command.XmlExp.Replace(d.DapperQuery, m => ":" + m.Groups["n"].Value);
+			string sql = Wintegra.JDBC.Db2Client.Db2Command.XmlExp.Replace(d.DapperQuery, m => ":" + m.Groups["n"].Value);
 			Assert.That(sql, Is.EqualTo(d.Query));
 		}
 

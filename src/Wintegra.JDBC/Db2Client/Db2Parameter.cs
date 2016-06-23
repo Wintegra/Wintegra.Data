@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
 
-namespace Wintegra.Data.jdbc
+namespace Wintegra.JDBC.Db2Client
 {
 	public sealed class Db2Parameter : DbParameter, ICloneable
 	{

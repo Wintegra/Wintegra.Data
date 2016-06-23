@@ -4,13 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3BAC14F4-CAF8-41AD-A8F6-C800DAC9C4F7}</ProjectGuid>
+    <ProjectGuid>{A3AE7A7D-6562-4981-B798-7803648F0377}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Wintegra.Data.Tests</RootNamespace>
-    <AssemblyName>Wintegra.Data.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <RootNamespace>Wintegra.JDBC</RootNamespace>
+    <AssemblyName>Wintegra.JDBC</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,9 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapper, Version=1.40.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Dapper.1.42\lib\net40\Dapper.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="db2jcc4, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\db2jcc4.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.AWT.WinForms, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
       <HintPath>..\..\packages\IKVM.8.1.5717.0\lib\IKVM.AWT.WinForms.dll</HintPath>
@@ -146,13 +150,7 @@
       <HintPath>..\..\packages\IKVM.8.1.5717.0\lib\IKVM.Runtime.JNI.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NUnit.3.2.1\lib\net40\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -160,51 +158,27 @@
     <Compile Include="..\AssemblySharedInfo.cs">
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
-    <Compile Include="Common\BigDecimalTest.cs" />
-    <Compile Include="Db2Client\DapperTest.cs" />
-    <Compile Include="Db2Client\Db2ConnectionTest.cs" />
-    <Compile Include="Db2Client\Db2DataReaderTest.cs">
-      <SubType>Code</SubType>
+    <Compile Include="Db2Client\Db2Command.cs">
+      <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Db2Client\Db2Driver.cs" />
-    <Compile Include="Db2Client\Db2MuiltiQueryTest.cs" />
-    <Compile Include="Db2Client\DB2NETNamedParamTest.cs" />
-    <Compile Include="Db2Client\Utility.cs" />
-    <Compile Include="Entities\CATEGORY_ENTRY.cs" />
-    <Compile Include="Entities\ENTRY_LIST.cs" />
-    <Compile Include="Entities\FILE_ENTRY.cs" />
-    <Compile Include="Entities\PACK_ENTRY.cs" />
+    <Compile Include="Db2Client\Db2Connection.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Db2Client\Db2ConnectionOptions.cs" />
+    <Compile Include="Db2Client\Db2ConnectionStringBuilder.cs" />
+    <Compile Include="Db2Client\Db2Connector.cs" />
+    <Compile Include="Db2Client\Db2DataReader.cs" />
+    <Compile Include="Db2Client\Db2DataType.cs" />
+    <Compile Include="Db2Client\Db2Exception.cs" />
+    <Compile Include="Db2Client\Db2Parameter.cs" />
+    <Compile Include="Db2Client\Db2ParameterCollection.cs" />
+    <Compile Include="Db2Client\Db2Transaction.cs" />
+    <Compile Include="Db2Client\Db2Util.cs" />
+    <Compile Include="Db2Client\TypeMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Scripts\v1.0.0\002.Create doc tables.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\v1.0.0\001.Create dbg_table.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\v1.1.0\001.Drop dbg_table.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\v1.1.0\003.Add files tables.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\v1.1.0\002.Add debug tables.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Wintegra.Data\Wintegra.Data.csproj">
-      <Project>{ec635a06-0390-44fa-a247-01f88636b272}</Project>
-      <Name>Wintegra.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Wintegra.JDBC\Wintegra.JDBC.csproj">
-      <Project>{a3ae7a7d-6562-4981-b798-7803648f0377}</Project>
-      <Name>Wintegra.JDBC</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

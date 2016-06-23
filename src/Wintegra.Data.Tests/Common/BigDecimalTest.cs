@@ -47,8 +47,8 @@ namespace Wintegra.Data.Tests.Common
 			float obj)
 		{
 			decimal value = global::System.Convert.ToDecimal(obj);
-			var bd = Wintegra.Data.jdbc.Db2Util.toBigDecimal(value);
-			var dec = Wintegra.Data.jdbc.Db2Util.ToDecimal(bd);
+			var bd = Wintegra.JDBC.Db2Client.Db2Util.toBigDecimal(value);
+			var dec = Wintegra.JDBC.Db2Client.Db2Util.ToDecimal(bd);
 			Assert.That(dec, Is.EqualTo(value));
 		}
 
@@ -56,8 +56,8 @@ namespace Wintegra.Data.Tests.Common
 		public void Decimal_MinValue()
 		{
 			decimal value = decimal.MinValue;
-			var bd = Wintegra.Data.jdbc.Db2Util.toBigDecimal(value);
-			var dec = Wintegra.Data.jdbc.Db2Util.ToDecimal(bd);
+			var bd = Wintegra.JDBC.Db2Client.Db2Util.toBigDecimal(value);
+			var dec = Wintegra.JDBC.Db2Client.Db2Util.ToDecimal(bd);
 			Assert.That(dec, Is.EqualTo(value));
 		}
 
@@ -65,8 +65,8 @@ namespace Wintegra.Data.Tests.Common
 		public void Decimal_MaxValue()
 		{
 			decimal value = decimal.MaxValue;
-			var bd = Wintegra.Data.jdbc.Db2Util.toBigDecimal(value);
-			var dec = Wintegra.Data.jdbc.Db2Util.ToDecimal(bd);
+			var bd = Wintegra.JDBC.Db2Client.Db2Util.toBigDecimal(value);
+			var dec = Wintegra.JDBC.Db2Client.Db2Util.ToDecimal(bd);
 			Assert.That(dec, Is.EqualTo(value));
 		}
 
@@ -75,7 +75,7 @@ namespace Wintegra.Data.Tests.Common
 			[Values("0E-7")] string value)
 		{
 			var bd = new BigDecimal(value);
-			var dec = Wintegra.Data.jdbc.Db2Util.ToDecimal(bd);
+			var dec = Wintegra.JDBC.Db2Client.Db2Util.ToDecimal(bd);
 		}
 	}
 }

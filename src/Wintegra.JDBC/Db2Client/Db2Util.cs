@@ -5,7 +5,7 @@ using Timestamp = java.sql.Timestamp;
 using Time = java.sql.Time;
 using Date = java.util.Date;
 
-namespace Wintegra.Data.jdbc
+namespace Wintegra.JDBC.Db2Client
 {
 	internal static class Db2Util
 	{

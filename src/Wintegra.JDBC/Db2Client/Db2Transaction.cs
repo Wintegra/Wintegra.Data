@@ -5,7 +5,7 @@ using System.Diagnostics;
 using java.sql;
 using Connection = java.sql.Connection;
 
-namespace Wintegra.Data.jdbc
+namespace Wintegra.JDBC.Db2Client
 {
 	public sealed class Db2Transaction : DbTransaction
 	{

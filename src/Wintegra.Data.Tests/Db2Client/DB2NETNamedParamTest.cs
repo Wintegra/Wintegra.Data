@@ -26,7 +26,7 @@ namespace Wintegra.Data.Tests.Db2Client
 				"...;DB2NETNamedParam=yes;...",
 				"...;DB2NETNamedParam=1;...")] string connectionString)
 		{
-			var builder = new Wintegra.Data.jdbc.Db2ConnectionStringBuilder(connectionString);
+			var builder = new Wintegra.JDBC.Db2Client.Db2ConnectionStringBuilder(connectionString);
 			Assert.That(builder.NamedParameters, Is.True);
 		}
 
@@ -36,7 +36,7 @@ namespace Wintegra.Data.Tests.Db2Client
 				"...;DB2NETNamedParam=no;...",
 				"...;DB2NETNamedParam=0;...")] string connectionString)
 		{
-			var builder = new Wintegra.Data.jdbc.Db2ConnectionStringBuilder(connectionString);
+			var builder = new Wintegra.JDBC.Db2Client.Db2ConnectionStringBuilder(connectionString);
 			Assert.That(builder.NamedParameters, Is.False);
 		}
 

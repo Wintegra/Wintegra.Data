@@ -1,4 +1,4 @@
-﻿namespace Wintegra.Data.jdbc
+﻿namespace Wintegra.JDBC.Db2Client
 {
 	public enum Db2DataType
 	{

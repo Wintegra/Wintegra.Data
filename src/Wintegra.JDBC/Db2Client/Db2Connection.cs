@@ -8,7 +8,7 @@ using DriverManager = java.sql.DriverManager;
 using Connection = java.sql.Connection;
 using SQLException = java.sql.SQLException;
 
-namespace Wintegra.Data.jdbc
+namespace Wintegra.JDBC.Db2Client
 {
 	public sealed class Db2Connection : DbConnection, ICloneable
 	{

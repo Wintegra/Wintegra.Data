@@ -4,7 +4,7 @@ using SQLException = java.sql.SQLException;
 using PrintStream = java.io.PrintStream;
 using ByteArrayOutputStream = java.io.ByteArrayOutputStream;
 
-namespace Wintegra.Data.jdbc
+namespace Wintegra.JDBC.Db2Client
 {
 	[Serializable]
 	public sealed class Db2Exception : DbException

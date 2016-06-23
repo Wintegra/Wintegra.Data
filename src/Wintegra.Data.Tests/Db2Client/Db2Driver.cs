@@ -30,7 +30,7 @@ namespace Wintegra.Data.Tests.Db2Client
 			switch (type)
 			{
 				case "jdbc":
-					return new Wintegra.Data.jdbc.Db2Connection(Connection["jdbc"]);
+					return new Wintegra.JDBC.Db2Client.Db2Connection(Connection["jdbc"]);
 				case "odbc":
 					return new Wintegra.Data.Db2Client.Db2Connection(Connection["odbc"]);
 			}
@@ -42,7 +42,7 @@ namespace Wintegra.Data.Tests.Db2Client
 			switch (type)
 			{
 				case "jdbc":
-					return new Wintegra.Data.jdbc.Db2Connection();
+					return new Wintegra.JDBC.Db2Client.Db2Connection();
 				case "odbc":
 					return new Wintegra.Data.Db2Client.Db2Connection();
 			}
