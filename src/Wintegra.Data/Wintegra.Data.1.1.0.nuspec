@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Wintegra.Data</id>
-        <version>1.0.0-alpha1</version>
+        <version>1.1.0</version>
         <authors>Wintegra Soft</authors>
         <licenseUrl>https://opensource.org/licenses/gpl-3.0.html</licenseUrl>
         <projectUrl>https://github.com/Wintegra/Wintegra.Data</projectUrl>
@@ -11,6 +11,7 @@
         <releaseNotes />
         <copyright>Copyright © Wintegra® 2016. All rights reserved.</copyright>
         <language>en-US</language>
+        <serviceable>false</serviceable>
     </metadata>
     <files>
         <file src="..\..\bin\Wintegra.Data.dll" target="lib\net20\Wintegra.Data.dll" />
