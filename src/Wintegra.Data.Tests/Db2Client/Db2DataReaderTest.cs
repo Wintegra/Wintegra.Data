@@ -1572,7 +1572,6 @@ namespace Wintegra.Data.Tests.Db2Client
 							Assert.That(reader.Read(), Is.True);
 							var actual = (DateTime)reader.GetValue(0);
 							Assert.That(actual, Is.Not.Null);
-							if ("jdbc".Equals(type)) actual = actual.ToLocalTime();
 							Assert.That(actual, Is.EqualTo(value));
 							Assert.That(reader.NextResult(), Is.False);
 						}
@@ -1616,7 +1615,6 @@ namespace Wintegra.Data.Tests.Db2Client
 							Assert.That(reader.Read(), Is.True);
 							var actual = reader.GetDateTime(0);
 							Assert.That(actual, Is.Not.Null);
-							if ("jdbc".Equals(type)) actual = actual.ToLocalTime();
 							Assert.That(actual, Is.EqualTo(value));
 							Assert.That(reader.NextResult(), Is.False);
 						}
@@ -1839,7 +1837,6 @@ namespace Wintegra.Data.Tests.Db2Client
 							Assert.That(reader.Read(), Is.True);
 							var actual = (DateTime)reader.GetValue(0);
 							Assert.That(actual, Is.Not.Null);
-							if ("jdbc".Equals(type)) actual = actual.ToLocalTime();
 							Assert.That(actual, Is.EqualTo(value));
 							Assert.That(reader.NextResult(), Is.False);
 						}
@@ -1883,7 +1880,6 @@ namespace Wintegra.Data.Tests.Db2Client
 							Assert.That(reader.Read(), Is.True);
 							var actual = reader.GetDateTime(0);
 							Assert.That(actual, Is.Not.Null);
-							if ("jdbc".Equals(type)) actual = actual.ToLocalTime();
 							Assert.That(actual, Is.EqualTo(value));
 							Assert.That(reader.NextResult(), Is.False);
 						}

@@ -1137,7 +1137,6 @@ namespace Wintegra.Data.Tests.Db2Client
 					var actual = list[0];
 					Assert.That(actual, Is.Not.Null);
 					Assert.That(actual.FIELD, Is.Not.Null);
-					if ("jdbc".Equals(type)) actual.FIELD = actual.FIELD.Value.ToLocalTime();
 					Assert.That(actual.FIELD, Is.EqualTo(value));
 					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
 				}
@@ -1290,7 +1289,6 @@ namespace Wintegra.Data.Tests.Db2Client
 					var actual = list[0];
 					Assert.That(actual, Is.Not.Null);
 					Assert.That(actual.FIELD, Is.Not.Null);
-					if ("jdbc".Equals(type)) actual.FIELD = actual.FIELD.Value.ToLocalTime();
 					Assert.That(actual.FIELD, Is.EqualTo(value));
 					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
 				}

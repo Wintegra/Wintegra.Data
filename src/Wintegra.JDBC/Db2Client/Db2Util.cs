@@ -41,13 +41,13 @@ namespace Wintegra.JDBC.Db2Client
 		internal static DateTime ToDateTime(Timestamp value)
 		{
 			long ticks = getNetTicks((Date)value);
-			return new System.DateTime(ticks);
+			return new System.DateTime(ticks).ToLocalTime();
 		}
 
 		internal static DateTime ToDateTime(Date value)
 		{
 			long ticks = getNetTicks(value);
-			return new System.DateTime(ticks);
+			return new System.DateTime(ticks).ToLocalTime();
 		}
 
 		internal static long getNetTicks(Date date)
