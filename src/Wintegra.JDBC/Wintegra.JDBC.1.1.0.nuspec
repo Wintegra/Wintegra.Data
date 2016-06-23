@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>Wintegra.JDBC</id>
+        <version>1.1.0</version>
+        <authors>Wintegra Soft</authors>
+        <licenseUrl>https://opensource.org/licenses/gpl-3.0.html</licenseUrl>
+        <projectUrl>https://github.com/Wintegra/Wintegra.Data</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Wrapper over IBM DB2 JDBC DRIVER in framework .NET V2.0</description>
+        <releaseNotes />
+        <copyright>Copyright © Wintegra® 2016. All rights reserved.</copyright>
+        <language>en-US</language>
+        <serviceable>false</serviceable>
+        <dependencies>
+            <dependency id="IKVM" version="8.1.5717.0" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="..\..\lib\db2jcc4.dll" target="lib\net20\db2jcc4.dll" />
+        <file src="..\..\bin\Wintegra.JDBC.dll" target="lib\net20\Wintegra.JDBC.dll" />
+    </files>
+</package>

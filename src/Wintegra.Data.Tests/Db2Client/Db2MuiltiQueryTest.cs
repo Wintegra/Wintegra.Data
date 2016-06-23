@@ -1,18 +1,31 @@
 ﻿using System.Data;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
+using Dapper;
 using NUnit.Framework;
+using Wintegra.Data.Tests.Entities;
 
 namespace Wintegra.Data.Tests.Db2Client
 {
 	[TestFixture]
 	public class Db2MuiltiQueryTest
 	{
+		[SetUp]
+		public void SetUp()
+		{
+			Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+			Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+		}
+
 		[Test]
 		public void TestSelectAndGetValue(
+			[Values("odbc", "jdbc")] string type,
 			[Values("67766215", "D519C704", "7F3D0A9B", "80971111")] string head_id,
 			[Values("F04D1BA3", "5B2BF4F1", "044815E1", "DB8CE88E")] string line_id,
 			[Values("simple", "any")] string note)
 		{
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
@@ -48,11 +61,12 @@ JOIN LINE l ON l.HEAD_ID=h.ID";
 
 		[Test]
 		public void TestSelectAndGetByName(
+			[Values("odbc", "jdbc")] string type,
 			[Values("67766215", "D519C704", "7F3D0A9B", "80971111")] string head_id,
 			[Values("F04D1BA3", "5B2BF4F1", "044815E1", "DB8CE88E")] string line_id,
 			[Values("simple", "any")] string note)
 		{
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
@@ -88,11 +102,12 @@ JOIN LINE l ON l.HEAD_ID=h.ID";
 
 		[Test]
 		public void TestSelectAndGetByAnyName(
+			[Values("odbc", "jdbc")] string type,
 			[Values("67766215", "D519C704", "7F3D0A9B", "80971111")] string head_id,
 			[Values("F04D1BA3", "5B2BF4F1", "044815E1", "DB8CE88E")] string line_id,
 			[Values("simple", "any")] string note)
 		{
-			using (var db = new Wintegra.Data.Db2Client.Db2Connection(Db2ConnectionTest.ConnectionString))
+			using (var db = Db2Driver.GetDbConnection(type))
 			{
 				db.Open();
 				using (var tn = db.BeginTransaction())
@@ -134,15 +149,15 @@ JOIN LINE l ON l.HEAD_ID=h.ID";
 			using (var command = db.CreateCommand())
 			{
 				command.Transaction = tn;
-				command.CommandText = "INSERT INTO HEAD(ID, NOTE) VALUES(@ID, @NOTE)";
+				command.CommandText = "INSERT INTO HEAD(ID, NOTE) VALUES(:ID, :NOTE)";
 
 				IDbDataParameter parameterObject = command.CreateParameter();
-				parameterObject.ParameterName = "@ID";
+				parameterObject.ParameterName = "ID";
 				parameterObject.Value = head_id;
 				command.Parameters.Add(parameterObject);
 
 				parameterObject = command.CreateParameter();
-				parameterObject.ParameterName = "@NOTE";
+				parameterObject.ParameterName = "NOTE";
 				parameterObject.Value = note + ":head";
 				command.Parameters.Add(parameterObject);
 
@@ -152,20 +167,20 @@ JOIN LINE l ON l.HEAD_ID=h.ID";
 			using (var command = db.CreateCommand())
 			{
 				command.Transaction = tn;
-				command.CommandText = "INSERT INTO LINE(ID, HEAD_ID, NOTE) VALUES(@ID, @HEAD_ID, @NOTE)";
+				command.CommandText = "INSERT INTO LINE(ID, HEAD_ID, NOTE) VALUES(:ID, :HEAD_ID, :NOTE)";
 
 				IDbDataParameter parameterObject = command.CreateParameter();
-				parameterObject.ParameterName = "@ID";
+				parameterObject.ParameterName = "ID";
 				parameterObject.Value = line_id;
 				command.Parameters.Add(parameterObject);
 
 				parameterObject = command.CreateParameter();
-				parameterObject.ParameterName = "@HEAD_ID";
+				parameterObject.ParameterName = "HEAD_ID";
 				parameterObject.Value = head_id;
 				command.Parameters.Add(parameterObject);
 
 				parameterObject = command.CreateParameter();
-				parameterObject.ParameterName = "@NOTE";
+				parameterObject.ParameterName = "NOTE";
 				parameterObject.Value = note + ":line";
 				command.Parameters.Add(parameterObject);
 
@@ -173,6 +188,185 @@ JOIN LINE l ON l.HEAD_ID=h.ID";
 			}
 
 			#endregion
+		}
+
+		[Test]
+		public void TestQueryMultipleWithoutParameters(
+			[Values("odbc", "jdbc")] string type,
+			[Values("67766215", "D519C704", "7F3D0A9B", "80971111")] string packId)
+		{
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO PACK_ENTRY(ID, CLOSE_DATE, CATEGORY_ID, GU_CODE, NO) VALUES(?, 2016, 1, 870000000, 1)", new { packId }, tn);
+
+					#region multuSql
+
+					const string multuSql =
+@"SELECT 
+	ID
+	, SHORTNAME
+	, NAME 
+FROM CATEGORY_LIST;
+
+SELECT 
+    p.ID, 
+    p.INCOME, 
+    p.CLOSE_DATE as CloseDate, 
+    p.CATEGORY_ID as CategoryCode, 
+    p.GU_CODE as GuCode, 
+    p.NO
+FROM PACK_ENTRY p
+FETCH FIRST 501 ROWS ONLY;";
+
+					#endregion
+
+					var list = new PACK_ENTRY_LIST(501);
+					using (var result = db.QueryMultiple(multuSql, transaction: tn))
+					{
+						var catrgoryList = result.Read<CATEGORY_ENTRY>().GroupBy(l => l.ID).ToDictionary(g => g.Key, g => g.Single());
+						foreach (var item in result.Read<PACK_ENTRY>())
+						{
+							item.CategoryName = catrgoryList[item.CategoryCode].ShortName;
+							list.Add(item);
+						}
+					}
+
+					foreach (PACK_ENTRY p in list)
+					{
+						Assert.That(p.ID, Is.EqualTo(packId));
+						Assert.That(p.CloseDate, Is.EqualTo(2016));
+						Assert.That(p.CategoryCode, Is.EqualTo(1));
+						Assert.That(p.CategoryName, Is.EqualTo("По старости"));
+						Assert.That(p.GuCode, Is.EqualTo(870000000));
+						Assert.That(p.No, Is.EqualTo(1));
+					}
+
+				}
+			}
+		}
+
+		[Test]
+		public void TestQueryMultipleWithParameters(
+			[Values("odbc", "jdbc")] string type,
+			[Values("67766215", "D519C704", "7F3D0A9B", "80971111")] string packId,
+			[Values(1, 2, 3, 4, 5)] int categoryCode)
+		{
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO PACK_ENTRY(ID, CLOSE_DATE, CATEGORY_ID, GU_CODE, NO) VALUES(?, 2016, ?, 870000000, 1)", new { packId, categoryCode }, tn);
+
+					#region multuSql
+
+					const string multuSql =
+@"SELECT 
+	ID
+	, SHORTNAME
+	, NAME 
+FROM CATEGORY_LIST
+WHERE ID=? AND 1=?;
+
+SELECT 
+    p.ID, 
+    p.INCOME, 
+    p.CLOSE_DATE as CloseDate, 
+    p.CATEGORY_ID as CategoryCode, 
+    p.GU_CODE as GuCode, 
+    p.NO
+FROM PACK_ENTRY p
+WHERE p.CATEGORY_ID=?
+FETCH FIRST 501 ROWS ONLY;";
+
+					#endregion
+
+					var list = new PACK_ENTRY_LIST(501);
+					using (var result = db.QueryMultiple(multuSql, new { id = categoryCode, p = 1, categoryCode }, tn))
+					{
+						var catrgoryList = result.Read<CATEGORY_ENTRY>().GroupBy(l => l.ID).ToDictionary(g => g.Key, g => g.Single());
+						foreach (var item in result.Read<PACK_ENTRY>())
+						{
+							item.CategoryName = catrgoryList[item.CategoryCode].ShortName;
+							list.Add(item);
+						}
+					}
+
+					foreach (PACK_ENTRY p in list)
+					{
+						Assert.That(p.ID, Is.EqualTo(packId));
+						Assert.That(p.CloseDate, Is.EqualTo(2016));
+						Assert.That(p.CategoryCode, Is.EqualTo(categoryCode));
+						Assert.That(p.GuCode, Is.EqualTo(870000000));
+						Assert.That(p.No, Is.EqualTo(1));
+					}
+
+				}
+			}
+		}
+
+		// This unit test support only JDBC wrapper
+		[Test]
+		[Category("Only JDBC")]
+		public void TestQueryMultipleWithNameParameters(
+			[Values("67766215", "D519C704", "7F3D0A9B", "80971111")] string packId,
+			[Values(1, 2, 3, 4, 5)] int categoryCode)
+		{
+			using (var db = Db2Driver.GetDbConnection("jdbc"))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO PACK_ENTRY(ID, CLOSE_DATE, CATEGORY_ID, GU_CODE, NO) VALUES(?, 2016, ?, 870000000, 1)", new { packId, categoryCode }, tn);
+
+					#region multuSql
+
+					const string multuSql =
+@"SELECT 
+	ID
+	, SHORTNAME
+	, NAME 
+FROM CATEGORY_LIST
+WHERE ID=:categoryCode AND 1=:p;
+
+SELECT 
+    p.ID, 
+    p.INCOME, 
+    p.CLOSE_DATE as CloseDate, 
+    p.CATEGORY_ID as CategoryCode, 
+    p.GU_CODE as GuCode, 
+    p.NO
+FROM PACK_ENTRY p
+WHERE p.ID=:packId AND p.CATEGORY_ID=:categoryCode
+FETCH FIRST 501 ROWS ONLY;";
+
+					#endregion
+
+					var list = new PACK_ENTRY_LIST(501);
+					using (var result = db.QueryMultiple(multuSql, new { packId, p = 1, categoryCode }, tn))
+					{
+						var catrgoryList = result.Read<CATEGORY_ENTRY>().GroupBy(l => l.ID).ToDictionary(g => g.Key, g => g.Single());
+						foreach (var item in result.Read<PACK_ENTRY>())
+						{
+							item.CategoryName = catrgoryList[item.CategoryCode].ShortName;
+							list.Add(item);
+						}
+					}
+
+					foreach (PACK_ENTRY p in list)
+					{
+						Assert.That(p.ID, Is.EqualTo(packId));
+						Assert.That(p.CloseDate, Is.EqualTo(2016));
+						Assert.That(p.CategoryCode, Is.EqualTo(categoryCode));
+						Assert.That(p.GuCode, Is.EqualTo(870000000));
+						Assert.That(p.No, Is.EqualTo(1));
+					}
+
+				}
+			}
 		}
 	}
 }

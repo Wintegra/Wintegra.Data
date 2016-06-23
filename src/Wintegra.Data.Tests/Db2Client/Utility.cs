@@ -11,9 +11,31 @@ namespace Wintegra.Data.Tests.Db2Client
 {
 	internal static class Utility
 	{
-		public static string RandomString(int length)
+		internal const int FieldCharacterSize = 254;
+		internal const int FieldGraphicSize = 127;
+		
+		public static char RandomAsciiChar()
 		{
 			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			var random = new Random((int)DateTime.UtcNow.Ticks);
+			return chars[random.Next(chars.Length)];
+		}
+
+		public static string RandomAsciiString(int length)
+		{
+			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			var random = new Random((int)DateTime.UtcNow.Ticks);
+			var sb = new StringBuilder(length);
+			for (int i = 0; i < length; i++)
+			{
+				sb.Append(chars[random.Next(chars.Length)]);
+			}
+			return sb.ToString();
+		}
+		
+		public static string RandomString(int length)
+		{
+			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
 			var random = new Random((int)DateTime.UtcNow.Ticks);
 			var sb = new StringBuilder(length);
 			for (int i = 0; i < length; i++)
@@ -74,6 +96,31 @@ namespace Wintegra.Data.Tests.Db2Client
 		public static IList<T> QueryObjects<T>(this IDbConnection conn, string query, object paramObject, T templateObject, IDbTransaction tn)
 		{
 			return conn.QueryObjects<T>(query, paramObject, tn);
+		}
+	}
+
+	[Serializable]
+	public class XmlObjectData
+	{
+		public XmlObjectData() { }
+		public string Field { get; set; }
+	}
+
+	class DBG_TABLE<T>
+	{
+		public T FIELD { get; set; }
+		public char EMPTY { get; set; }
+	}
+
+	public class SqlQueryObject
+	{
+		public string DapperQuery { get; set; }
+		public string Query { get; set; }
+
+		public SqlQueryObject(string dapper, string sql)
+		{
+			this.DapperQuery = dapper;
+			this.Query = sql;
 		}
 	}
 }
