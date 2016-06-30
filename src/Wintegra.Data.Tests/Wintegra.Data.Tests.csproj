@@ -169,6 +169,7 @@
     <Compile Include="Db2Client\Db2Driver.cs" />
     <Compile Include="Db2Client\Db2MuiltiQueryTest.cs" />
     <Compile Include="Db2Client\DB2NETNamedParamTest.cs" />
+    <Compile Include="Db2Client\StressTest.cs" />
     <Compile Include="Db2Client\Utility.cs" />
     <Compile Include="Entities\CATEGORY_ENTRY.cs" />
     <Compile Include="Entities\ENTRY_LIST.cs" />
