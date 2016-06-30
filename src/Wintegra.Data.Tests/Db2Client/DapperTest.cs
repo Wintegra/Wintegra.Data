@@ -1347,12 +1347,14 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		#region XML data type
 
+		#region DapperSet
 		private static readonly List<SqlQueryObject> DapperSet = new List<SqlQueryObject>()
 		{
 			new SqlQueryObject("INSERT INTO DBG_TABLE(XML_BODY) VALUES(:XML_BODY)","INSERT INTO DBG_TABLE(XML_BODY) VALUES(:XML_BODY)") ,
 			new SqlQueryObject("INSERT INTO DBG_TABLE(XML_BODY) VALUES((:XML_BODY1,:XML_BODY2))","INSERT INTO DBG_TABLE(XML_BODY) VALUES(:XML_BODY)"),
 			new SqlQueryObject("INSERT INTO DBG_TABLE(XML_BODY) VALUES((:XML_BODY11,:XML_BODY12),(:XML_BODY21,:XML_BODY22))","INSERT INTO DBG_TABLE(XML_BODY) VALUES(:XML_BODY1,:XML_BODY2)"),
 		};
+		#endregion
 
 		[Test, TestCaseSource("DapperSet")]
 		public void TestXmlExp(SqlQueryObject d)
@@ -1378,6 +1380,42 @@ namespace Wintegra.Data.Tests.Db2Client
 				using (var tn = db.BeginTransaction())
 				{
 					db.Execute("INSERT INTO DBG_TABLE_XML(FIELD) VALUES(:XML_BODY)", new { XML_BODY = xml }, tn);
+					var list = db.QueryObjects<DBG_TABLE<XmlDocument>>("SELECT FIELD FROM DBG_TABLE_XML", new { }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual.FIELD, Is.Not.Null);
+					Assert.That(actual.EMPTY, Is.EqualTo((char)0));
+
+
+					Assert.That(actual.FIELD.OuterXml
+						.Substring("<?xml version=\"1.0\" encoding=\"UTF-16\"?>".Length),
+						Is.EqualTo(xml.OuterXml
+						.Substring("<?xml version=\"1.0\"?>".Length)));
+				}
+			}
+		}
+
+		[Test]
+		public void TestWriteAndReadXmlAsBytes(
+			[Values("odbc", "jdbc")] string type,
+			[Values(1024, 4096, 8192, 65536, 1048576, 4194304)] int length)
+		{
+			var d = new XmlObjectData()
+			{
+				Field = Utility.RandomString(length),
+			};
+			var xml = d.ToXmlDocument();
+			var b = xml.ToArrayBytes();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_XML(FIELD) VALUES(:XML_BODY)", new { XML_BODY = b }, tn);
 					var list = db.QueryObjects<DBG_TABLE<XmlDocument>>("SELECT FIELD FROM DBG_TABLE_XML", new { }, tn);
 
 					Assert.That(list, Is.Not.Null);
@@ -1439,6 +1477,128 @@ namespace Wintegra.Data.Tests.Db2Client
 					var actual = list[0];
 					Assert.That(actual.FIELD, Is.Null);
 					Assert.That(actual.EMPTY, Is.EqualTo(ch));
+				}
+			}
+		}
+
+		#endregion
+
+		#region XmlElement
+
+		[Test]
+		public void TestXmlElement(
+			[Values("odbc", "jdbc")] string type,
+			[Values(5, 7, 23, 59, 307, 991)] int length)
+		{
+			var d = new SysUserData()
+			{
+				Login = Utility.RandomString(length),
+				FirstName = Utility.RandomString(length),
+				LastName = Utility.RandomString(length),
+				MiddleName = length >= 53 ? Utility.RandomString(length) : "",
+				Division = length,
+			};
+			var xml = d.ToXmlDocument();
+
+			string sql =
+@"select xmlelement (name ""SysUserData"", 
+    xmlelement(name ""Login"", t.Login),
+    xmlelement(name ""FirstName"", t.FirstName),
+    xmlelement(name ""LastName"", t.LastName),
+    xmlelement(name ""MiddleName"", nvl(t.MiddleName,'')),
+    xmlelement(name ""Division"", t.Division)
+) as FIELD 
+from table(values(
+    cast(:login as vargraphic(1024)),
+    cast(:firstName as vargraphic(1024)),
+    cast(:lastName as vargraphic(1024)),
+    cast(:middleName as vargraphic(1024)),
+    cast(:division as integer)
+  )) as t(Login, FirstName, LastName, MiddleName, Division)";
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				var list = db.QueryObjects<DBG_TABLE<XmlDocument>>(sql, new { d.Login, d.FirstName, d.LastName, d.MiddleName, d.Division });
+
+				Assert.That(list, Is.Not.Null);
+				Assert.That(list.Count, Is.EqualTo(1));
+
+				var actual = list[0];
+				Assert.That(actual, Is.Not.Null);
+				Assert.That(actual.FIELD, Is.Not.Null);
+				Assert.That(actual.FIELD.OuterXml, Is.Not.Null);
+
+				actual.FIELD.DocumentElement.SetAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
+				actual.FIELD.DocumentElement.SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+				actual.FIELD.DocumentElement.SetAttribute("xmlns", "http://schemas.wintegra.ru");
+
+				var head = "<?xml version=\"1.0\" encoding=\"UTF-16\"?>";
+				Assert.That(actual.FIELD.OuterXml.Length, Is.GreaterThan(head.Length));
+				Assert.That(actual.FIELD.OuterXml
+					.Substring(head.Length),
+					Is.EqualTo(xml.OuterXml
+					.Substring("<?xml version=\"1.0\"?>".Length)));
+			}
+		}
+
+		#endregion
+
+		#region XMLTABLE
+
+		[Test]
+		public void TestXmlTable(
+			[Values("odbc", "jdbc")] string type,
+			[Values(5, 7, 23, 59, 307, 991)] int length)
+		{
+			char ch = Utility.RandomAsciiChar();
+			var d = new SysUserData()
+			{
+				Login = Utility.RandomString(length),
+				FirstName = Utility.RandomString(length),
+				LastName = Utility.RandomString(length),
+				MiddleName = length >= 53 ? Utility.RandomString(length) : null,
+				Division = length,
+			};
+			var xml = d.ToXmlDocument();
+
+			using (var db = Db2Driver.GetDbConnection(type))
+			{
+				db.Open();
+				using (var tn = db.BeginTransaction())
+				{
+					db.Execute("INSERT INTO DBG_TABLE_XML(FIELD, EMPTY) VALUES(:XML_BODY,:CH)", new { XML_BODY = xml, CH = ch }, tn);
+					string sql =
+@"SELECT
+    u.LOGIN as Login,
+    u.FNAME as FirstName,
+    u.LNAME as LastName,
+    u.MNAME as MiddleName,
+    u.DIVISION as Division,
+
+    XML2CLOB(t.FIELD) as FIELD -- Debug
+FROM DBG_TABLE_XML t
+,XMLTABLE(XMLNAMESPACES(DEFAULT 'http://schemas.wintegra.ru'),
+   ' $d/SysUserData' passing t.FIELD as ""d""
+    columns
+        LOGIN VARGRAPHIC(1024) path 'Login'
+        ,FNAME VARGRAPHIC(1024) path 'FirstName'
+        ,LNAME VARGRAPHIC(1024) path 'LastName'
+        ,MNAME VARGRAPHIC(1024) path 'MiddleName'
+        ,DIVISION INTEGER path 'Division'
+) as u
+where u.LOGIN=:login";
+					var list = db.QueryObjects<SysUserData>(sql, new { login = d.Login }, tn);
+
+					Assert.That(list, Is.Not.Null);
+					Assert.That(list.Count, Is.EqualTo(1));
+
+					var actual = list[0];
+					Assert.That(actual, Is.Not.Null);
+					Assert.That(actual.Login, Is.EqualTo(d.Login));
+					Assert.That(actual.FirstName, Is.EqualTo(d.FirstName));
+					Assert.That(actual.LastName, Is.EqualTo(d.LastName));
+					Assert.That(actual.MiddleName, Is.EqualTo(d.MiddleName));
+					Assert.That(actual.Division, Is.EqualTo(d.Division));
 				}
 			}
 		}

@@ -66,7 +66,7 @@ namespace Wintegra.Data.Db2Client
 			set { _command.Transaction = value; }
 		}
 
-		private static readonly Regex ParameterRegex = new Regex(@"[@:][^ ,).]+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex ParameterRegex = new Regex(@"(?<!--(\w*\s*)*|'(\w*\s*)*|""(\w*\s*)*)[@:][^\n,)]\w*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 		public string CommandText
 		{

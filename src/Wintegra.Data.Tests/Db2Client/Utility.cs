@@ -11,6 +11,9 @@ namespace Wintegra.Data.Tests.Db2Client
 {
 	internal static class Utility
 	{
+		private static long m_ticks = 0;
+		private static long Ticks { get { return ++m_ticks; } }
+
 		internal const int FieldCharacterSize = 254;
 		internal const int FieldGraphicSize = 127;
 		
@@ -24,7 +27,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		public static string RandomAsciiString(int length)
 		{
 			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-			var random = new Random((int)DateTime.UtcNow.Ticks);
+			var random = new Random((int)(DateTime.UtcNow.Ticks + Ticks));
 			var sb = new StringBuilder(length);
 			for (int i = 0; i < length; i++)
 			{
@@ -36,7 +39,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		public static string RandomString(int length)
 		{
 			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
-			var random = new Random((int)DateTime.UtcNow.Ticks);
+			var random = new Random((int)(DateTime.UtcNow.Ticks + Ticks));
 			var sb = new StringBuilder(length);
 			for (int i = 0; i < length; i++)
 			{
@@ -68,6 +71,15 @@ namespace Wintegra.Data.Tests.Db2Client
 			}
 
 			return document;
+		}
+
+		public static byte[] ToArrayBytes(this XmlDocument document)
+		{
+			using (var ms = new MemoryStream())
+			{
+				document.Save(ms);
+				return ms.ToArray();
+			}
 		}
 
 		public static IList<T> QueryObjects<T>(this IDbConnection conn, string query)
@@ -106,6 +118,19 @@ namespace Wintegra.Data.Tests.Db2Client
 		public string Field { get; set; }
 	}
 
+	[Serializable]
+	public class SysUserData
+	{
+		public SysUserData() { }
+		public string Login { get; set; }
+		public string FirstName { get; set; }
+		public string LastName { get; set; }
+		public string MiddleName { get; set; }
+		public int Division { get; set; }
+
+		public string FIELD { get; set; }
+	}
+
 	class DBG_TABLE<T>
 	{
 		public T FIELD { get; set; }
@@ -121,6 +146,18 @@ namespace Wintegra.Data.Tests.Db2Client
 		{
 			this.DapperQuery = dapper;
 			this.Query = sql;
+		}
+	}
+	
+	public class SqlCommandTextObject
+	{
+		public string CommandText { get; set; }
+		public string Query { get; set; }
+
+		public SqlCommandTextObject(string commandText, string query)
+		{
+			this.CommandText = commandText;
+			this.Query = query;
 		}
 	}
 }
