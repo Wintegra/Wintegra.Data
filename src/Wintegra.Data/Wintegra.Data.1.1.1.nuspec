@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>Wintegra.Data</id>
+        <version>1.1.1</version>
+        <authors>Wintegra Soft</authors>
+        <licenseUrl>https://opensource.org/licenses/gpl-3.0.html</licenseUrl>
+        <projectUrl>https://github.com/Wintegra/Wintegra.Data</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Wrapper over IBM DB2 ODBC DRIVER over Microsoft ODBC provider V2.0.0.0 in framework .NET V2.0</description>
+        <releaseNotes />
+        <copyright>Copyright © Wintegra® 2016. All rights reserved.</copyright>
+        <language>en-US</language>
+        <serviceable>false</serviceable>
+    </metadata>
+    <files>
+        <file src="..\..\bin\Wintegra.Data.dll" target="lib\net20\Wintegra.Data.dll" />
+    </files>
+</package>

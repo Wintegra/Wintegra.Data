@@ -16,6 +16,6 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 [assembly: NeutralResourcesLanguage("en")]
 
-[assembly: AssemblyVersionAttribute("1.1.0.1")]
-[assembly: AssemblyInformationalVersionAttribute("1.1.0.1-devel")]
-[assembly: AssemblyFileVersionAttribute("1.1.0.1")]
+[assembly: AssemblyVersionAttribute("1.1.1.0")]
+[assembly: AssemblyInformationalVersionAttribute("1.1.1.0-devel")]
+[assembly: AssemblyFileVersionAttribute("1.1.1.0")]
