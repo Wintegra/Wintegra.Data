@@ -1502,6 +1502,10 @@ namespace Wintegra.Data.Tests.Db2Client
 
 			string sql =
 @"select xmlelement (name ""SysUserData"", 
+    xmlnamespaces(
+         'http://www.w3.org/2001/XMLSchema' as ""xsd"",
+         'http://www.w3.org/2001/XMLSchema-instance' as ""xsi"",
+         DEFAULT 'http://schemas.wintegra.ru'),
     xmlelement(name ""Login"", t.Login),
     xmlelement(name ""FirstName"", t.FirstName),
     xmlelement(name ""LastName"", t.LastName),
@@ -1527,10 +1531,6 @@ from table(values(
 				Assert.That(actual, Is.Not.Null);
 				Assert.That(actual.FIELD, Is.Not.Null);
 				Assert.That(actual.FIELD.OuterXml, Is.Not.Null);
-
-				actual.FIELD.DocumentElement.SetAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
-				actual.FIELD.DocumentElement.SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-				actual.FIELD.DocumentElement.SetAttribute("xmlns", "http://schemas.wintegra.ru");
 
 				var head = "<?xml version=\"1.0\" encoding=\"UTF-16\"?>";
 				Assert.That(actual.FIELD.OuterXml.Length, Is.GreaterThan(head.Length));
