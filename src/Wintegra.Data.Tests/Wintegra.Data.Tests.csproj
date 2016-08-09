@@ -11,6 +11,10 @@
     <AssemblyName>Wintegra.Data.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -171,6 +175,7 @@
     <Compile Include="Db2Client\Db2MuiltiQueryTest.cs" />
     <Compile Include="Db2Client\DB2NETNamedParamTest.cs" />
     <Compile Include="Db2Client\StressTest.cs" />
+    <Compile Include="Db2Client\SystemFuncTest.cs" />
     <Compile Include="Db2Client\Utility.cs" />
     <Compile Include="Entities\CATEGORY_ENTRY.cs" />
     <Compile Include="Entities\ENTRY_LIST.cs" />

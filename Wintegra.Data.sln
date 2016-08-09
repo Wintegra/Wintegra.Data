@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintegra.Data", "src\Wintegra.Data\Wintegra.Data.csproj", "{EC635A06-0390-44FA-A247-01F88636B272}"
 EndProject
@@ -30,5 +30,20 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://10.22.60.150:8080/tfs/wintegrasoft
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = src\\Wintegra.Data.Tests\\Wintegra.Data.Tests.csproj
+		SccProjectName1 = src/Wintegra.Data.Tests
+		SccLocalPath1 = src\\Wintegra.Data.Tests
+		SccProjectUniqueName2 = src\\Wintegra.Data\\Wintegra.Data.csproj
+		SccProjectName2 = src/Wintegra.Data
+		SccLocalPath2 = src\\Wintegra.Data
+		SccProjectUniqueName3 = src\\Wintegra.JDBC\\Wintegra.JDBC.csproj
+		SccProjectName3 = src/Wintegra.JDBC
+		SccLocalPath3 = src\\Wintegra.JDBC
 	EndGlobalSection
 EndGlobal

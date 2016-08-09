@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Text.RegularExpressions;
 
 namespace Wintegra.Data.Db2Client
 {
@@ -66,15 +65,10 @@ namespace Wintegra.Data.Db2Client
 			set { _command.Transaction = value; }
 		}
 
-		private static readonly Regex ParameterRegex = new Regex(@"(?<!--(\w*\s*)*|'(\w*\s*)*|""(\w*\s*)*)[@:][^\n,)]\w*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
 		public string CommandText
 		{
 			get { return _command.CommandText; }
-			set
-			{
-				_command.CommandText = ParameterRegex.Replace(value, "?");
-			}
+			set { _command.CommandText = Db2CommandText.ToODBC(value); }
 		}
 
 		public int CommandTimeout

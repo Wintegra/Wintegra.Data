@@ -48,6 +48,7 @@
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
     <Compile Include="Db2Client\Db2Command.cs" />
+    <Compile Include="Db2Client\Db2CommandText.cs" />
     <Compile Include="Db2Client\Db2Connection.cs" />
     <Compile Include="Db2Client\Db2DataParameterCollection.cs" />
     <Compile Include="Db2Client\Db2DataReader.cs" />
