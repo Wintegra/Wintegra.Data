@@ -50,7 +50,7 @@ namespace Wintegra.Data.Db2Client
 				{
 					foreach (var odbcDriverName in odbcDriverNames)
 					{
-						if (odbcDriverName.StartsWith("IBM DB2 ODBC DRIVER -"))
+						if (odbcDriverName.StartsWith("IBM DB2 ODBC DRIVER -") || odbcDriverName.StartsWith("IBM DATA SERVER DRIVER for ODBC -"))
 						{
 							connectionString = connectionString.Replace("{IBM DB2 ODBC DRIVER}", "{" + odbcDriverName + "}");
 							break;
