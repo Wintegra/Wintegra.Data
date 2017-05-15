@@ -50,6 +50,8 @@
     <Compile Include="Db2Client\Db2Command.cs" />
     <Compile Include="Db2Client\Db2CommandText.cs" />
     <Compile Include="Db2Client\Db2Connection.cs" />
+    <Compile Include="Db2Client\Db2ConnectionOptions.cs" />
+    <Compile Include="Db2Client\Db2ConnectionStringBuilder.cs" />
     <Compile Include="Db2Client\Db2DataParameterCollection.cs" />
     <Compile Include="Db2Client\Db2DataReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

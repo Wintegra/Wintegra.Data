@@ -22,7 +22,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		[Test]
 		[Ignore("Нагрузочный тест на DB2")]
 		public void GetConectionCount(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(1,17,37,67)] int lenght)
 		{
 			const string sql = "select nvl(count(*),0) from FILE_ENTRY";

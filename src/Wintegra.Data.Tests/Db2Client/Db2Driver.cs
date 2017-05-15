@@ -8,8 +8,7 @@ namespace Wintegra.Data.Tests.Db2Client
 	{
 		internal static readonly Dictionary<string, string> Connection = new Dictionary<string, string>()
 		{
-			{ "odbc", "Driver={IBM DB2 ODBC DRIVER};DataBase=DB1; HostName=192.168.213.130; Protocol=TCPIP;Port=50000;Uid=root;Pwd=password;CurrentSchema=DB01;DB2NETNamedParam=1;HostVarParameters=1" },
-			{ "jdbc", "jdbc:db2://192.168.213.130:50000/DB1:currentSchema=DB01;user=root;password=password;fullyMaterializeLobData=true;DB2NETNamedParam=1;" },
+			{ "odbc", "Driver={IBM DB2 ODBC DRIVER};DataBase=DB1; HostName=127.0.0.1; Protocol=TCPIP;Port=50000;Uid=root;Pwd=password;CurrentSchema=DB01;DB2NETNamedParam=1;HostVarParameters=1;OdbcCommandTimeout=37" },
 		};
 		internal const string TypeDb2Driver = "odbc";
 
@@ -17,36 +16,30 @@ namespace Wintegra.Data.Tests.Db2Client
 		{
 			switch (type)
 			{
-				case "jdbc":
-					return Connection["jdbc"];
 				case "odbc":
 					return Connection["odbc"];
 			}
-			throw new ArgumentOutOfRangeException("type", type, "Use [odbc|jdbc]");
+			throw new ArgumentOutOfRangeException("type", type, "Use [odbc]");
 		}
 
 		internal static IDbConnection GetDbConnection(string type = TypeDb2Driver)
 		{
 			switch (type)
 			{
-				case "jdbc":
-					return new Wintegra.JDBC.Db2Client.Db2Connection(Connection["jdbc"]);
 				case "odbc":
 					return new Wintegra.Data.Db2Client.Db2Connection(Connection["odbc"]);
 			}
-			throw new ArgumentOutOfRangeException("type", type, "Use [odbc|jdbc]");
+			throw new ArgumentOutOfRangeException("type", type, "Use [odbc]");
 		}
 
 		internal static IDbConnection GetDbConnectionWithConnectionString(string type = TypeDb2Driver)
 		{
 			switch (type)
 			{
-				case "jdbc":
-					return new Wintegra.JDBC.Db2Client.Db2Connection();
 				case "odbc":
 					return new Wintegra.Data.Db2Client.Db2Connection();
 			}
-			throw new ArgumentOutOfRangeException("type", type, "Use [odbc|jdbc]");
+			throw new ArgumentOutOfRangeException("type", type, "Use [odbc]");
 		}
 	}
 }

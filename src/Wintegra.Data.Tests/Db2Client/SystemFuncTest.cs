@@ -8,7 +8,7 @@ namespace Wintegra.Data.Tests.Db2Client
 	public class SystemFuncTest
 	{
 		[Test]
-		public void TO_CHAR([Values("odbc", "jdbc")] string type,
+		public void TO_CHAR([Values("odbc")] string type,
 			[Values("2016-06-20 16:49:05.057", "2016-08-08 13:59:26.784")] string valueString)
 		{
 			var value = DateTime.Parse(valueString).ToUniversalTime();

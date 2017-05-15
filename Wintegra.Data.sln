@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintegra.Data", "src\Winteg
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintegra.Data.Tests", "src\Wintegra.Data.Tests\Wintegra.Data.Tests.csproj", "{3BAC14F4-CAF8-41AD-A8F6-C800DAC9C4F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintegra.JDBC", "src\Wintegra.JDBC\Wintegra.JDBC.csproj", "{A3AE7A7D-6562-4981-B798-7803648F0377}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,27 +21,8 @@ Global
 		{3BAC14F4-CAF8-41AD-A8F6-C800DAC9C4F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BAC14F4-CAF8-41AD-A8F6-C800DAC9C4F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BAC14F4-CAF8-41AD-A8F6-C800DAC9C4F7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A3AE7A7D-6562-4981-B798-7803648F0377}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A3AE7A7D-6562-4981-B798-7803648F0377}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A3AE7A7D-6562-4981-B798-7803648F0377}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A3AE7A7D-6562-4981-B798-7803648F0377}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = http://10.22.60.150:8080/tfs/wintegrasoft
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = src\\Wintegra.Data.Tests\\Wintegra.Data.Tests.csproj
-		SccProjectName1 = src/Wintegra.Data.Tests
-		SccLocalPath1 = src\\Wintegra.Data.Tests
-		SccProjectUniqueName2 = src\\Wintegra.Data\\Wintegra.Data.csproj
-		SccProjectName2 = src/Wintegra.Data
-		SccLocalPath2 = src\\Wintegra.Data
-		SccProjectUniqueName3 = src\\Wintegra.JDBC\\Wintegra.JDBC.csproj
-		SccProjectName3 = src/Wintegra.JDBC
-		SccLocalPath3 = src\\Wintegra.JDBC
 	EndGlobalSection
 EndGlobal

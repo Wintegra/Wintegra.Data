@@ -8,7 +8,13 @@ namespace Wintegra.Data.Db2Client
 {
 	public class Db2Connection : IDbConnection
 	{
-		private readonly IDbConnection _connection;
+		public static explicit operator OdbcConnection(Db2Connection connection)
+		{
+			return connection._connection;
+		}
+
+		internal Db2ConnectionStringBuilder Settings { get; private set; }
+		private readonly OdbcConnection _connection;
 
 		public Db2Connection()
 		{
@@ -17,11 +23,11 @@ namespace Wintegra.Data.Db2Client
 
 		public Db2Connection(string connectionRawString)
 		{
-			var connectionString = GetConnectionString(connectionRawString);
-			_connection = new OdbcConnection(connectionString);
+			Settings = GetConnectionString(connectionRawString);
+			_connection = new OdbcConnection(Settings.ConnectionString);
 		}
 
-		private static string GetConnectionString(string connectionRawString)
+		private static Db2ConnectionStringBuilder GetConnectionString(string connectionRawString)
 		{
 			var connectionString = connectionRawString;
 			var name = Environment.MachineName.ToLower();
@@ -58,7 +64,7 @@ namespace Wintegra.Data.Db2Client
 					}
 				}
 			}
-			return connectionString;
+			return new Db2ConnectionStringBuilder(connectionString);
 		}
 
 		private static string[] GetOdbcDriverNames()
@@ -109,7 +115,9 @@ namespace Wintegra.Data.Db2Client
 
 		public IDbCommand CreateCommand()
 		{
-			return new Db2Command(_connection.CreateCommand());
+			var command = new Db2Command(_connection.CreateCommand());
+			command.CommandTimeout = Settings.CommandTimeout;
+			return command;
 		}
 
 		public void Open()
@@ -122,14 +130,15 @@ namespace Wintegra.Data.Db2Client
 			get { return _connection.ConnectionString; }
 			set
 			{
-				var connectionString = GetConnectionString(value);
-				_connection.ConnectionString = connectionString;
+				Settings = GetConnectionString(value);
+				_connection.ConnectionString = Settings.ConnectionString;
 			}
 		}
 
 		public int ConnectionTimeout
 		{
 			get { return _connection.ConnectionTimeout; }
+			set { _connection.ConnectionTimeout = value; }
 		}
 
 		public string Database

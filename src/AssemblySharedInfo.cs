@@ -9,13 +9,13 @@ using System.Runtime.InteropServices;
 #endif
 [assembly: AssemblyCompany("Wintegra®")]
 [assembly: AssemblyProduct("This package contain driver set for use with IBM DB2 database.")]
-[assembly: AssemblyCopyright("Copyright © Wintegra® 2016. All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © Wintegra® 2016-2017. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
 [assembly: NeutralResourcesLanguage("en")]
 
-[assembly: AssemblyVersionAttribute("1.1.2.0")]
-[assembly: AssemblyInformationalVersionAttribute("1.1.2.0-devel")]
-[assembly: AssemblyFileVersionAttribute("1.1.2.0")]
+[assembly: AssemblyVersion("1.1.3.0")]
+[assembly: AssemblyInformationalVersion("1.1.3.0-devel")]
+[assembly: AssemblyFileVersion("1.1.3.0")]

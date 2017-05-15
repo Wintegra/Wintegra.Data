@@ -24,7 +24,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadCharacter(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(1, 4, 64, 254)] int length)
 		{
 			string character = Utility.RandomAsciiString(length);
@@ -69,7 +69,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullCharacter([Values("odbc", "jdbc")] string type)
+		public void TestReadNullCharacter([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -112,7 +112,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadVarchar(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(1, 4, 64, 254)] int length)
 		{
 			string varchar = Utility.RandomAsciiString(length);
@@ -155,7 +155,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullVarchar([Values("odbc", "jdbc")] string type)
+		public void TestReadNullVarchar([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -198,7 +198,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadClob(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(1024, 4096, 8192, 65536, 1048576, 4194304)] int length)
 		{
 			string clob = Utility.RandomString(length);
@@ -239,7 +239,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullClob([Values("odbc", "jdbc")] string type)
+		public void TestReadNullClob([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -282,7 +282,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadGraphic(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(1, 4, 64, 127)] int length)
 		{
 			string graphic = Utility.RandomAsciiString(length);
@@ -327,7 +327,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullGraphic([Values("odbc", "jdbc")] string type)
+		public void TestReadNullGraphic([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -370,7 +370,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadVargraphic(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(1, 4, 64, 1024)] int length)
 		{
 			string vargraphic = Utility.RandomAsciiString(length);
@@ -413,7 +413,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullVargraphic([Values("odbc", "jdbc")] string type)
+		public void TestReadNullVargraphic([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -456,7 +456,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadDbclob(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(1024, 4096, 8192, 65536, 1048576, 4194304)] int length)
 		{
 			string dbclob = Utility.RandomString(length);
@@ -496,7 +496,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullDbclob([Values("odbc", "jdbc")] string type)
+		public void TestReadNullDbclob([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -539,7 +539,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadBlob(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(1024, 4096, 8192, 65536, 1048576, 4194304)] int length)
 		{
 			byte[] blob = Encoding.UTF8.GetBytes(Utility.RandomString(length));
@@ -579,7 +579,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullBlob([Values("odbc", "jdbc")] string type)
+		public void TestReadNullBlob([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -625,7 +625,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadSmallint(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(short.MinValue, -1, 0, 1, short.MaxValue)] short value)
 		{
 			using (var db = Db2Driver.GetDbConnection(type))
@@ -667,7 +667,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadSmallintAsInt16(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(short.MinValue, -1, 0, 1, short.MaxValue)] short value)
 		{
 			using (var db = Db2Driver.GetDbConnection(type))
@@ -708,7 +708,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullSmallint([Values("odbc", "jdbc")] string type)
+		public void TestReadNullSmallint([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -751,7 +751,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadInteger(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(int.MinValue, short.MinValue, -1, 0, 1, 7, short.MaxValue, int.MaxValue)] int value)
 		{
 			using (var db = Db2Driver.GetDbConnection(type))
@@ -793,7 +793,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadIntegerAsInt32(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(int.MinValue, short.MinValue, -1, 0, 1, 7, short.MaxValue, int.MaxValue)] int value)
 		{
 			using (var db = Db2Driver.GetDbConnection(type))
@@ -834,7 +834,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullInteger([Values("odbc", "jdbc")] string type)
+		public void TestReadNullInteger([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -877,7 +877,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadBigint(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(long.MinValue, int.MinValue, short.MinValue, -1, 0, 1, 7, short.MaxValue, int.MaxValue, long.MaxValue)] long value)
 		{
 			using (var db = Db2Driver.GetDbConnection(type))
@@ -919,7 +919,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadBigintAsInt64(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(int.MinValue, short.MinValue, -1, 0, 1, 7, short.MaxValue, int.MaxValue)] int value)
 		{
 			using (var db = Db2Driver.GetDbConnection(type))
@@ -960,7 +960,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullBigint([Values("odbc", "jdbc")] string type)
+		public void TestReadNullBigint([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -1023,7 +1023,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadDecimal(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values("MinValue", "MinusOne", "Zero", "One", "MaxValue")] string valueString)
 		{
 			decimal value = GetDecimal(valueString);
@@ -1067,7 +1067,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadDecimalAsDecimal(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values("MinValue", "MinusOne", "Zero", "One", "MaxValue")] string valueString)
 		{
 			decimal value = GetDecimal(valueString);
@@ -1110,7 +1110,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullDecimal([Values("odbc", "jdbc")] string type)
+		public void TestReadNullDecimal([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -1153,137 +1153,13 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		// ODBC not supported DECFLOAT
 
-		[Test]
-		public void TestWriteAndReadDecfloat(
-			[Values("jdbc")] string type,
-			[Values("MinValue", "MinusOne", "Zero", "One", "MaxValue")] string valueString)
-		{
-			decimal value = GetDecimal(valueString);
-			using (var db = Db2Driver.GetDbConnection(type))
-			{
-				db.Open();
-				using (var tn = db.BeginTransaction())
-				{
-					using (var command = db.CreateCommand())
-					{
-						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE_DECFLOAT(FIELD) VALUES(:FIELD)";
-
-						IDbDataParameter parameterObject = command.CreateParameter();
-						parameterObject.ParameterName = "FIELD";
-						parameterObject.Value = value;
-						command.Parameters.Add(parameterObject);
-
-						var rowCount = command.ExecuteNonQuery();
-						Assert.That(rowCount, Is.EqualTo(1));
-					}
-
-					using (var command = db.CreateCommand())
-					{
-						command.Transaction = tn;
-						command.CommandText = "SELECT FIELD FROM DBG_TABLE_DECFLOAT";
-
-						using (var reader = command.ExecuteReader())
-						{
-							Assert.That(reader.Read(), Is.True);
-							var actual = (decimal)reader.GetValue(0);
-							Assert.That(actual, Is.Not.Null);
-							Assert.That(actual, Is.EqualTo(value));
-							Assert.That(reader.NextResult(), Is.False);
-						}
-					}
-				}
-			}
-		}
-
-		[Test]
-		public void TestWriteAndReadDecfloatAsDecimal(
-			[Values("jdbc")] string type,
-			[Values("MinValue", "MinusOne", "Zero", "One", "MaxValue")] string valueString)
-		{
-			decimal value = GetDecimal(valueString);
-			using (var db = Db2Driver.GetDbConnection(type))
-			{
-				db.Open();
-				using (var tn = db.BeginTransaction())
-				{
-					using (var command = db.CreateCommand())
-					{
-						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE_DECFLOAT(FIELD) VALUES(:FIELD)";
-
-						IDbDataParameter parameterObject = command.CreateParameter();
-						parameterObject.ParameterName = "FIELD";
-						parameterObject.Value = value;
-						command.Parameters.Add(parameterObject);
-
-						var rowCount = command.ExecuteNonQuery();
-						Assert.That(rowCount, Is.EqualTo(1));
-					}
-
-					using (var command = db.CreateCommand())
-					{
-						command.Transaction = tn;
-						command.CommandText = "SELECT FIELD FROM DBG_TABLE_DECFLOAT";
-
-						using (var reader = command.ExecuteReader())
-						{
-							Assert.That(reader.Read(), Is.True);
-							var actual = reader.GetDecimal(0);
-							Assert.That(actual, Is.Not.Null);
-							Assert.That(actual, Is.EqualTo(value));
-							Assert.That(reader.NextResult(), Is.False);
-						}
-					}
-				}
-			}
-		}
-
-		[Test]
-		public void TestReadNullDecfloat([Values("jdbc")] string type)
-		{
-			char ch = Utility.RandomAsciiChar();
-
-			using (var db = Db2Driver.GetDbConnection(type))
-			{
-				db.Open();
-				using (var tn = db.BeginTransaction())
-				{
-					using (var command = db.CreateCommand())
-					{
-						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE_DECFLOAT(EMPTY) VALUES('" + ch + "')";
-
-						command.ExecuteNonQuery();
-					}
-
-					using (var command = db.CreateCommand())
-					{
-						command.Transaction = tn;
-						command.CommandText = "SELECT EMPTY, FIELD FROM DBG_TABLE_DECFLOAT";
-
-						using (var reader = command.ExecuteReader())
-						{
-							Assert.That(reader.Read(), Is.True);
-							var msg = reader.GetChar(0);
-							var isNull = reader.IsDBNull(1);
-							Assert.That(msg, Is.EqualTo(ch));
-							Assert.That(isNull, Is.True);
-							Assert.That(reader.NextResult(), Is.False);
-						}
-
-					}
-				}
-			}
-		}
-
 		#endregion
 
 		#region REAL
 
 		[Test]
 		public void TestWriteAndReadReal(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(float.MinValue, -1.1f, -0.0f, 0.0f, 1.1f, float.MaxValue)] float value)
 		{
 			using (var db = Db2Driver.GetDbConnection(type))
@@ -1325,7 +1201,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadRealAsFloat(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(float.MinValue, -1.1f, -0.0f, 0.0f, 1.1f, float.MaxValue)] float value)
 		{
 			using (var db = Db2Driver.GetDbConnection(type))
@@ -1366,7 +1242,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullReal([Values("odbc","jdbc")] string type)
+		public void TestReadNullReal([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -1409,7 +1285,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadDouble(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(double.MinValue, -1.0, 0.0, 1.0, Double.MaxValue)] double value)
 		{
 			using (var db = Db2Driver.GetDbConnection(type))
@@ -1451,7 +1327,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadDoubleAsDouble(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(double.MinValue, -1.0, 0.0, 1.0, Double.MaxValue)] double value)
 		{
 			using (var db = Db2Driver.GetDbConnection(type))
@@ -1492,7 +1368,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullDouble([Values("odbc", "jdbc")] string type)
+		public void TestReadNullDouble([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -1539,7 +1415,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadDate(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values("2016-06-20")] string valueString)
 		{
 			var value = DateTime.Parse(valueString);
@@ -1582,7 +1458,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadDateAsDateTime(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values("2016-06-20")] string valueString)
 		{
 			var value = DateTime.Parse(valueString);
@@ -1624,7 +1500,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullDate([Values("odbc", "jdbc")] string type)
+		public void TestReadNullDate([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -1667,7 +1543,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadTime(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values("16:49:05")] string valueString)
 		{
 			var value = TimeSpan.Parse(valueString);
@@ -1709,59 +1585,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestWriteAndReadTimeAsTimespanp(
-			[Values("jdbc")] string type,
-			[Values("16:49:05")] string valueString)
-		{
-			var value = TimeSpan.Parse(valueString);
-			using (var jdbc = Db2Driver.GetDbConnection(type))
-			{
-				var db = jdbc as Wintegra.JDBC.Db2Client.Db2Connection;
-				Assert.That(db, Is.Not.Null);
-
-				db.Open();
-				using (var jtn = db.BeginTransaction())
-				{
-					var tn = jtn as Wintegra.JDBC.Db2Client.Db2Transaction;
-					Assert.That(tn, Is.Not.Null);
-
-					using (var command = db.CreateCommand())
-					{
-						command.Transaction = tn;
-						command.CommandText = "INSERT INTO DBG_TABLE_TIME(FIELD) VALUES(:FIELD)";
-
-						IDbDataParameter parameterObject = command.CreateParameter();
-						parameterObject.ParameterName = "FIELD";
-						parameterObject.Value = value;
-						command.Parameters.Add(parameterObject);
-
-						var rowCount = command.ExecuteNonQuery();
-						Assert.That(rowCount, Is.EqualTo(1));
-					}
-
-					using (var command = db.CreateCommand())
-					{
-						command.Transaction = tn;
-						command.CommandText = "SELECT FIELD FROM DBG_TABLE_TIME";
-
-						using (var jreader = command.ExecuteReader())
-						{
-							var reader = jreader as Wintegra.JDBC.Db2Client.Db2DataReader;
-							Assert.That(reader, Is.Not.Null);
-
-							Assert.That(reader.Read(), Is.True);
-							var actual = reader.GetTime(0);
-							Assert.That(actual, Is.Not.Null);
-							Assert.That(actual, Is.EqualTo(value));
-							Assert.That(reader.NextResult(), Is.False);
-						}
-					}
-				}
-			}
-		}
-
-		[Test]
-		public void TestReadNullTime([Values("odbc", "jdbc")] string type)
+		public void TestReadNullTime([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -1804,7 +1628,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadTimestamp(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values("2016-06-20 16:49:05.057")] string valueString)
 		{
 			var value = DateTime.Parse(valueString).ToUniversalTime();
@@ -1847,7 +1671,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadTimestampAsDateTime(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values("2016-06-20 16:49:05.057")] string valueString)
 		{
 			var value = DateTime.Parse(valueString).ToUniversalTime();
@@ -1889,7 +1713,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullTimestamp([Values("odbc", "jdbc")] string type)
+		public void TestReadNullTimestamp([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 
@@ -1934,7 +1758,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestWriteAndReadXml(
-			[Values("jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values(1024, 4096, 8192, 65536, 1048576, 4194304)] int length)
 		{
 			var d = new XmlObjectData()
@@ -1984,7 +1808,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestReadNullXml([Values("odbc", "jdbc")] string type)
+		public void TestReadNullXml([Values("odbc")] string type)
 		{
 			char ch = Utility.RandomAsciiChar();
 

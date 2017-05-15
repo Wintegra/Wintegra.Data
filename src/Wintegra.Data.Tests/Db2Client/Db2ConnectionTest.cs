@@ -1,8 +1,9 @@
 ﻿using System.Data;
-using System.Data.Common;
+using System.Data.Odbc;
 using System.Globalization;
 using System.Threading;
 using NUnit.Framework;
+using Wintegra.Data.Db2Client;
 
 namespace Wintegra.Data.Tests.Db2Client
 {
@@ -18,11 +19,11 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void BasicLifecycle(
-			[Values("jdbc")] string type)
+			[Values("odbc")] string type)
 		{
 			using (var db = Db2Driver.GetDbConnection(type))
 			{
-				var conn = db as DbConnection;
+				var conn = (OdbcConnection)(db as Db2Connection);
 				Assert.That(conn, Is.Not.Null);
 
 				bool eventOpen = false, eventClosed = false;
@@ -54,7 +55,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestSelectAndRead(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values("It is work", "Any simple string")] string name)
 		{
 			string d;
@@ -77,7 +78,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		
 		[Test]
 		public void TestSetConnectionStringAndRead(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values("It is work", "Any simple string")] string name)
 		{
 			string d;
@@ -102,7 +103,7 @@ namespace Wintegra.Data.Tests.Db2Client
 
 		[Test]
 		public void TestSelectWhereAndRead(
-			[Values("odbc", "jdbc")] string type,
+			[Values("odbc")] string type,
 			[Values("It is work", "Any simple string")] string name,
 			[Values(":ID", ":1")] string parameterName)
 		{
