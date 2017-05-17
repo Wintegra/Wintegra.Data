@@ -20,7 +20,11 @@ namespace Wintegra.Data.Db2Client
 
 		private void Init()
 		{
-			KeyChain.Add("OdbcCommandTimeout", int.Parse(OdbcCommandTimeout.Match(_connectionString).Groups["it"].Value));
+			var match = OdbcCommandTimeout.Match(_connectionString);
+			if (match.Success)
+			{
+				KeyChain.Add("OdbcCommandTimeout", int.Parse(match.Groups["it"].Value));
+			}
 		}
 	}
 }

@@ -18,7 +18,7 @@ namespace Wintegra.Data.Tests.Db2Client
 		}
 
 		[Test]
-		public void TestCommandTimeout(
+		public void EnableCommandTimeout(
 			[Values("...;OdbcCommandTimeout=0;...",
 				"...;OdbcCommandTimeout=5;...",
 				"...;OdbcCommandTimeout=93;...")] string connectionString)
@@ -26,6 +26,15 @@ namespace Wintegra.Data.Tests.Db2Client
 			var value = int.Parse(OdbcCommandTimeout.Match(connectionString).Groups["it"].Value);
 			var builder = new Wintegra.Data.Db2Client.Db2ConnectionStringBuilder(connectionString);
 			Assert.That(builder.CommandTimeout, Is.EqualTo(value));
+		}
+
+		[Test]
+		public void DisableCommandTimeout(
+			[Values("...;DB2NETNamedParam=1;...",
+				"...;HostVarParameters=1;...")] string connectionString)
+		{
+			var builder = new Wintegra.Data.Db2Client.Db2ConnectionStringBuilder(connectionString);
+			Assert.That(builder.CommandTimeout, Is.EqualTo(30));
 		}
 	}
 }
